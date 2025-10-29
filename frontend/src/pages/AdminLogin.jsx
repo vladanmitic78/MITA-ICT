@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, User, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { useToast } from '../hooks/use-toast';
-import { mockAdmin } from '../mock';
+import { toast } from 'sonner';
+import { authAPI } from '../api';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
