@@ -25,43 +25,36 @@ const AdminLogin = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock login - checking against mock data
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    if (credentials.username === mockAdmin.username && credentials.password === mockAdmin.password) {
+    try {
+      const response = await authAPI.login(credentials);
+      localStorage.setItem('adminToken', response.data.access_token);
       localStorage.setItem('adminAuth', 'true');
-      toast({
-        title: 'Login Successful',
-        description: 'Welcome to the admin dashboard!'
-      });
+      toast.success('Welcome to the admin dashboard!');
       navigate('/admin/dashboard');
-    } else {
-      toast({
-        title: 'Login Failed',
-        description: 'Invalid username or password',
-        variant: 'destructive'
-      });
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error(error.response?.data?.detail || 'Invalid username or password');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     
-    // Mock Google login
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Simulate successful Google login
-    localStorage.setItem('adminAuth', 'true');
-    localStorage.setItem('authMethod', 'google');
-    toast({
-      title: 'Login Successful',
-      description: 'Welcome to the admin dashboard!'
-    });
-    navigate('/admin/dashboard');
-    
-    setIsLoading(false);
+    try {
+      const response = await authAPI.googleLogin();
+      localStorage.setItem('adminToken', response.data.access_token);
+      localStorage.setItem('adminAuth', 'true');
+      localStorage.setItem('authMethod', 'google');
+      toast.success('Welcome to the admin dashboard!');
+      navigate('/admin/dashboard');
+    } catch (error) {
+      console.error('Google login error:', error);
+      toast.error('Google login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
