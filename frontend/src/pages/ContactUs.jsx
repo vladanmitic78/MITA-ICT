@@ -161,6 +161,25 @@ const ContactUs = () => {
             padding: '40px'
           }}>
             <form onSubmit={handleSubmit}>
+              <style>{`
+                [data-radix-select-item] {
+                  color: #FFFFFF !important;
+                  background-color: transparent !important;
+                }
+                [data-radix-select-item]:hover,
+                [data-radix-select-item][data-highlighted] {
+                  background-color: #00FFD1 !important;
+                  color: #000000 !important;
+                }
+                [data-radix-select-item][data-state="checked"] {
+                  background-color: #00FFD1 !important;
+                  color: #000000 !important;
+                }
+                [data-radix-select-item] svg {
+                  color: #000000;
+                }
+              `}</style>
+              
               <div style={{ marginBottom: '24px' }}>
                 <label htmlFor="name" className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>
                   Name / Company Name *
