@@ -13,7 +13,7 @@ from models import (
     Service, ServiceCreate, ServiceUpdate,
     SaasProduct, SaasProductCreate, SaasProductUpdate,
     Contact, ContactCreate,
-    AdminLogin, Token, Admin
+    AdminLogin, Token, Admin, ChangePassword
 )
 from auth import (
     verify_password, get_password_hash, create_access_token, 
