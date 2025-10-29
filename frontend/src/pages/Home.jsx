@@ -20,6 +20,8 @@ const Home = () => {
         setServices(response.data);
       } catch (error) {
         console.error('Error fetching services:', error);
+        // Set empty array on error to prevent undefined issues
+        setServices([]);
       } finally {
         setLoading(false);
       }
