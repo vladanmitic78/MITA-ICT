@@ -190,10 +190,6 @@ const AdminLogin = () => {
             </>
           )}
         </Button>
-
-        <p className="body-muted" style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px' }}>
-          Demo credentials: admin / admin123
-        </p>
       </div>
     </div>
   );
