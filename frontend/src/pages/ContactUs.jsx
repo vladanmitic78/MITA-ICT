@@ -243,14 +243,18 @@ const ContactUs = () => {
                   }}>
                     <SelectValue placeholder="Select a service" />
                   </SelectTrigger>
-                  <SelectContent style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: '0px',
-                    maxHeight: '300px',
-                    overflowY: 'auto',
-                    zIndex: 9999
-                  }}>
+                  <SelectContent 
+                    position="popper"
+                    sideOffset={5}
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '0px',
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                      zIndex: 9999,
+                      width: 'var(--radix-select-trigger-width)'
+                    }}>
                     <SelectItem value="saas">SaaS</SelectItem>
                     <SelectItem value="it-consulting">IT consulting</SelectItem>
                     <SelectItem value="telco-consulting">Telco consulting</SelectItem>
