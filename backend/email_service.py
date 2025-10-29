@@ -6,7 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-SMTP_HOST = os.environ.get('SMTP_HOST', 'mail.mitaict.com')
+SMTP_HOST = os.environ.get('SMTP_HOST', 'es17.siteground.eu')
 SMTP_PORT = int(os.environ.get('SMTP_PORT', 465))
 SMTP_USERNAME = os.environ.get('SMTP_USERNAME', 'info@mitaict.com')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
