@@ -22,29 +22,47 @@ const ContactUs = () => {
 
   // Load reCAPTCHA script
   useEffect(() => {
-    const loadRecaptcha = () => {
-      const script = document.createElement('script');
-      script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        console.log('reCAPTCHA script loaded');
-        setRecaptchaLoaded(true);
-      };
-      script.onerror = () => {
-        console.error('Failed to load reCAPTCHA script');
-      };
-      document.head.appendChild(script);
-
-      return () => {
-        // Cleanup
-        if (document.head.contains(script)) {
-          document.head.removeChild(script);
-        }
-      };
+    const loadRecaptcha = async () => {
+      try {
+        const script = document.createElement('script');
+        script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+        script.async = true;
+        script.defer = true;
+        
+        const scriptLoadPromise = new Promise((resolve, reject) => {
+          script.onload = () => {
+            console.log('reCAPTCHA script loaded');
+            setRecaptchaLoaded(true);
+            resolve();
+          };
+          script.onerror = (error) => {
+            console.error('Failed to load reCAPTCHA script', error);
+            reject(error);
+          };
+        });
+        
+        document.head.appendChild(script);
+        
+        await scriptLoadPromise.catch(err => {
+          console.error('reCAPTCHA script loading error caught:', err);
+        });
+        
+      } catch (error) {
+        console.error('Error in reCAPTCHA loading:', error);
+      }
     };
 
     loadRecaptcha();
+    
+    return () => {
+      // Cleanup
+      const scripts = document.querySelectorAll(`script[src*="recaptcha"]`);
+      scripts.forEach(script => {
+        if (document.head.contains(script)) {
+          document.head.removeChild(script);
+        }
+      });
+    };
   }, [RECAPTCHA_SITE_KEY]);
 
   const handleChange = (e) => {
