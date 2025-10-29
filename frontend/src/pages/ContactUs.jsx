@@ -18,11 +18,13 @@ const ContactUs = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
 
+  const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY || '6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3';
+
   // Load reCAPTCHA script
   useEffect(() => {
     const loadRecaptcha = () => {
       const script = document.createElement('script');
-      script.src = 'https://www.google.com/recaptcha/api.js?render=6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3';
+      script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
       script.async = true;
       script.defer = true;
       script.onload = () => {
@@ -43,7 +45,7 @@ const ContactUs = () => {
     };
 
     loadRecaptcha();
-  }, []);
+  }, [RECAPTCHA_SITE_KEY]);
 
   const handleChange = (e) => {
     setFormData({
