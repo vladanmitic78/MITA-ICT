@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Network, Building2, Users, ArrowRight } from 'lucide-react';
-import { mockData } from '../mock';
+import { publicAPI } from '../api';
 
 const iconMap = {
   Network: Network,
