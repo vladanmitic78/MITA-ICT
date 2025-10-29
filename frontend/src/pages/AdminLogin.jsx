@@ -8,9 +8,7 @@ import { authAPI } from '../api';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [loginMethod, setLoginMethod] = useState('password'); // 'password' or 'google'
   const [credentials, setCredentials] = useState({
     username: '',
     password: ''
