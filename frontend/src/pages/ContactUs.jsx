@@ -34,21 +34,27 @@ const ContactUs = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate reCAPTCHA
-    if (!window.grecaptcha) {
-      toast.error('reCAPTCHA not loaded. Please refresh the page.');
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      const token = await window.grecaptcha.execute('6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3', { action: 'submit' });
+      let token = null;
+      
+      // Try to get reCAPTCHA token if available
+      if (window.grecaptcha && window.grecaptcha.execute) {
+        try {
+          token = await window.grecaptcha.execute('6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3', { action: 'submit' });
+        } catch (recaptchaError) {
+          console.warn('reCAPTCHA execution failed:', recaptchaError);
+          // Continue without reCAPTCHA token
+        }
+      } else {
+        console.warn('reCAPTCHA not loaded, submitting without verification');
+      }
       
       // Submit to API
       await publicAPI.submitContact({
         ...formData,
-        recaptcha_token: token
+        recaptcha_token: token || 'no-token'
       });
       
       toast.success('Thank you for contacting us! We will get back to you soon.');
@@ -62,11 +68,18 @@ const ContactUs = () => {
         comment: ''
       });
       
-      // Reset reCAPTCHA
-      window.grecaptcha.reset();
+      // Reset reCAPTCHA if available
+      if (window.grecaptcha && window.grecaptcha.reset) {
+        try {
+          window.grecaptcha.reset();
+        } catch (resetError) {
+          console.warn('reCAPTCHA reset failed:', resetError);
+        }
+      }
     } catch (error) {
       console.error('Form submission error:', error);
-      toast.error(error.response?.data?.detail || 'Failed to submit form. Please try again.');
+      const errorMessage = error.response?.data?.detail || error.message || 'Failed to submit form. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
