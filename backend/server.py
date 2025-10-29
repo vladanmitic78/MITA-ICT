@@ -187,8 +187,9 @@ async def submit_contact(contact: ContactCreate):
         )
         await db.contacts.insert_one(contact_data.dict())
         
-        # Send email notification
+        # Send email notifications
         try:
+            # Send notification to admin
             await send_contact_email(
                 name=contact.name,
                 email=contact.email,
@@ -196,7 +197,17 @@ async def submit_contact(contact: ContactCreate):
                 service=contact.service,
                 comment=contact.comment
             )
-            logger.info(f"✅ Contact form submitted and email sent: {contact.email}")
+            logger.info(f"✅ Admin notification email sent for: {contact.email}")
+            
+            # Send auto-response to user
+            await send_auto_response_email(
+                name=contact.name,
+                email=contact.email,
+                phone=contact.phone,
+                service=contact.service
+            )
+            logger.info(f"✅ Auto-response email sent to: {contact.email}")
+            
         except Exception as e:
             logger.error(f"❌ Email sending failed: {str(e)}")
             # Still save to database even if email fails
