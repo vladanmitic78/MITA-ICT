@@ -159,37 +159,6 @@ const AdminLogin = () => {
               )}
             </Button>
           </form>
-
-        <div style={{ textAlign: 'center', margin: '24px 0' }}>
-          <span className="body-muted">or</span>
-        </div>
-
-        <Button
-          onClick={handleGoogleLogin}
-          disabled={isLoading}
-          className="btn-secondary"
-          style={{
-            width: '100%',
-            background: 'rgba(255, 255, 255, 0.1)',
-            color: '#FFFFFF',
-            borderRadius: '0px',
-            fontSize: '18px',
-            fontWeight: 500,
-            minHeight: '56px'
-          }}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="animate-spin" size={20} />
-              Connecting...
-            </>
-          ) : (
-            <>
-              <Mail size={20} />
-              Continue with Google
-            </>
-          )}
-        </Button>
       </div>
     </div>
   );
