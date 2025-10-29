@@ -46,47 +46,57 @@ const SaasStore = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
             gap: '40px'
           }}>
-            {mockData.saasProducts.map((product) => (
-              <div
-                key={product.id}
-                className="dark-hover"
-                style={{
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-subtle)',
-                  padding: '40px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'all 0.4s ease-in-out'
-                }}
-              >
-                <h3 className="heading-1" style={{ marginBottom: '16px' }}>{product.title}</h3>
-                <p className="body-medium" style={{ marginBottom: '24px', flex: 1 }}>
-                  {product.description}
-                </p>
-                
-                {/* Features List */}
-                <div style={{ marginBottom: '32px' }}>
-                  {product.features.map((feature, index) => (
-                    <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                      <CheckCircle2 size={20} color="var(--brand-primary)" />
-                      <span className="body-medium">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* CTA Button */}
-                <a
-                  href={product.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary"
-                  style={{ textDecoration: 'none', width: '100%' }}
+            {loading ? (
+              <p className="body-large" style={{ textAlign: 'center', gridColumn: '1 / -1' }}>
+                Loading products...
+              </p>
+            ) : products.length === 0 ? (
+              <p className="body-large" style={{ textAlign: 'center', gridColumn: '1 / -1' }}>
+                No products available
+              </p>
+            ) : (
+              products.map((product) => (
+                <div
+                  key={product.id}
+                  className="dark-hover"
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '40px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.4s ease-in-out'
+                  }}
                 >
-                  Learn More
-                  <ExternalLink size={20} />
-                </a>
-              </div>
-            ))}
+                  <h3 className="heading-1" style={{ marginBottom: '16px' }}>{product.title}</h3>
+                  <p className="body-medium" style={{ marginBottom: '24px', flex: 1 }}>
+                    {product.description}
+                  </p>
+                  
+                  {/* Features List */}
+                  <div style={{ marginBottom: '32px' }}>
+                    {product.features && product.features.map((feature, index) => (
+                      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                        <CheckCircle2 size={20} color="var(--brand-primary)" />
+                        <span className="body-medium">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <a
+                    href={product.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary"
+                    style={{ textDecoration: 'none', width: '100%' }}
+                  >
+                    Learn More
+                    <ExternalLink size={20} />
+                  </a>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
