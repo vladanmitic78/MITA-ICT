@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Edit2, Trash2, Mail, Save } from 'lucide-react';
+import { LogOut, Plus, Edit2, Trash2, Mail, Save, Settings } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
