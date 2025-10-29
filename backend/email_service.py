@@ -72,3 +72,82 @@ async def send_contact_email(name: str, email: str, phone: str, service: str, co
     except Exception as e:
         logger.error(f"Failed to send email: {str(e)}")
         raise Exception(f"Email sending failed: {str(e)}")
+
+async def send_auto_response_email(name: str, email: str, phone: str, service: str):
+    """Send auto-response email to user who submitted contact form"""
+    try:
+        # Create message
+        message = MIMEMultipart('alternative')
+        message['From'] = SMTP_FROM_EMAIL
+        message['To'] = email
+        message['Subject'] = 'Thank You for Contacting MITAICT'
+
+        # Service name mapping for better display
+        service_names = {
+            'saas': 'SaaS',
+            'it-consulting': 'IT consulting',
+            'telco-consulting': 'Telco consulting',
+            'leadership': 'Leadership',
+            'pnl-optimization': 'PnL optimisation',
+            'company-registration': 'Setting up a company in Sweden',
+            'others': 'Others'
+        }
+        service_display = service_names.get(service, service)
+
+        # Create HTML body
+        html_body = f"""
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border: 1px solid #ddd;">
+              <h2 style="color: #00FFD1; border-bottom: 2px solid #00FFD1; padding-bottom: 10px;">Thank You for Contacting MITAICT</h2>
+              
+              <div style="background-color: white; padding: 20px; margin-top: 20px; border-radius: 5px;">
+                <p>Dear <strong>{name}</strong>,</p>
+                
+                <p>Thank you for reaching out to MITAICT. We have received your inquiry and our team will get back to you shortly. Below are the details you submitted for our reference:</p>
+                
+                <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0; border-left: 4px solid #00FFD1;">
+                  <p style="margin: 5px 0;"><strong>Name:</strong> {name}</p>
+                  <p style="margin: 5px 0;"><strong>Email:</strong> {email}</p>
+                  <p style="margin: 5px 0;"><strong>Mobile Phone:</strong> {phone}</p>
+                  <p style="margin: 5px 0;"><strong>Selected Service:</strong> {service_display}</p>
+                </div>
+                
+                <p>If any of the information above is incorrect, please reply to this email with the correct details.</p>
+                
+                <p>We appreciate your interest in our services and look forward to assisting you soon.</p>
+                
+                <p style="margin-top: 30px;">Warm regards,<br>
+                <strong>MITA ICT Team</strong></p>
+              </div>
+              
+              <div style="margin-top: 20px; padding: 15px; background-color: #e8f8f5; border-radius: 5px; text-align: center;">
+                <p style="margin: 5px 0; font-size: 14px;">📧 <a href="mailto:info@mitaict.com" style="color: #00FFD1; text-decoration: none;">info@mitaict.com</a></p>
+                <p style="margin: 5px 0; font-size: 14px;">🌐 <a href="http://www.mitaict.com" style="color: #00FFD1; text-decoration: none;">www.mitaict.com</a></p>
+              </div>
+            </div>
+          </body>
+        </html>
+        """
+
+        # Attach HTML body
+        html_part = MIMEText(html_body, 'html')
+        message.attach(html_part)
+
+        # Send email using SSL
+        await aiosmtplib.send(
+            message,
+            hostname=SMTP_HOST,
+            port=SMTP_PORT,
+            username=SMTP_USERNAME,
+            password=SMTP_PASSWORD,
+            use_tls=True,
+            start_tls=False
+        )
+        
+        logger.info(f"Auto-response email sent successfully to {email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to send auto-response email: {str(e)}")
+        raise Exception(f"Auto-response email sending failed: {str(e)}")
