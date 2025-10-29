@@ -169,10 +169,16 @@ const AdminDashboard = () => {
         alignItems: 'center'
       }}>
         <h1 className="display-large">Admin Dashboard</h1>
-        <Button onClick={handleLogout} className="btn-secondary">
-          <LogOut size={20} />
-          Logout
-        </Button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <Button onClick={() => navigate('/admin/settings')} className="btn-secondary">
+            <Settings size={20} />
+            Settings
+          </Button>
+          <Button onClick={handleLogout} className="btn-secondary">
+            <LogOut size={20} />
+            Logout
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
