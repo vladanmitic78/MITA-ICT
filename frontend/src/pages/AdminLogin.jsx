@@ -80,8 +80,8 @@ const AdminLogin = () => {
           <p className="body-medium" style={{ color: 'var(--text-muted)' }}>Access your dashboard</p>
         </div>
 
-        {loginMethod === 'password' ? (
-          <form onSubmit={handlePasswordLogin}>
+        {/* Password Login Form */}
+        <form onSubmit={handlePasswordLogin}>
             <div style={{ marginBottom: '24px' }}>
               <label htmlFor="username" className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>
                 Username
