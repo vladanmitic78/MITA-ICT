@@ -65,10 +65,6 @@ const Footer = () => {
               <span className="body-muted">info@mitaict.com</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <Phone size={20} color="var(--brand-primary)" />
-              <span className="body-muted">+46 XXX XXX XXX</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <MapPin size={20} color="var(--brand-primary)" />
               <span className="body-muted">Sweden</span>
             </div>
