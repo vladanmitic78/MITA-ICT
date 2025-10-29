@@ -50,6 +50,12 @@ const ContactUs = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate required fields
+    if (!formData.name || !formData.email || !formData.phone || !formData.service) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
