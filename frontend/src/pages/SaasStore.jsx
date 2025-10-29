@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink, CheckCircle2 } from 'lucide-react';
-import { mockData } from '../mock';
+import { publicAPI } from '../api';
 
 const SaasStore = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await publicAPI.getSaasProducts();
+        setProducts(response.data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>
       {/* Hero Section */}
