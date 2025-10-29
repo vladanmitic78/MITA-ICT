@@ -62,6 +62,8 @@ const ContactUs = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('Form submission started', formData);
+    
     // Validate required fields
     if (!formData.name || !formData.email || !formData.phone || !formData.service) {
       toast.error('Please fill in all required fields');
@@ -74,22 +76,27 @@ const ContactUs = () => {
       let token = null;
       
       // Try to get reCAPTCHA token if available
-      if (window.grecaptcha && window.grecaptcha.execute) {
+      if (window.grecaptcha && typeof window.grecaptcha.execute === 'function') {
         try {
+          console.log('Executing reCAPTCHA...');
           token = await window.grecaptcha.execute('6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3', { action: 'submit' });
+          console.log('reCAPTCHA token obtained');
         } catch (recaptchaError) {
           console.warn('reCAPTCHA execution failed:', recaptchaError);
           // Continue without reCAPTCHA token
         }
       } else {
-        console.warn('reCAPTCHA not loaded, submitting without verification');
+        console.warn('reCAPTCHA not available, submitting without verification');
       }
       
       // Submit to API
-      await publicAPI.submitContact({
+      console.log('Submitting to API...');
+      const response = await publicAPI.submitContact({
         ...formData,
         recaptcha_token: token || 'no-token'
       });
+      
+      console.log('API response:', response);
       
       toast.success('Thank you for contacting us! We will get back to you soon.');
       
@@ -103,7 +110,7 @@ const ContactUs = () => {
       });
       
       // Reset reCAPTCHA if available
-      if (window.grecaptcha && window.grecaptcha.reset) {
+      if (window.grecaptcha && typeof window.grecaptcha.reset === 'function') {
         try {
           window.grecaptcha.reset();
         } catch (resetError) {
@@ -112,10 +119,17 @@ const ContactUs = () => {
       }
     } catch (error) {
       console.error('Form submission error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        stack: error.stack
+      });
+      
       const errorMessage = error.response?.data?.detail || error.message || 'Failed to submit form. Please try again.';
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
+      console.log('Form submission completed');
     }
   };
 
