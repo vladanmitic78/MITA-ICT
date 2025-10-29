@@ -188,11 +188,12 @@ const ContactUs = () => {
                     borderRadius: '0px'
                   }}>
                     <SelectItem value="saas">SaaS</SelectItem>
-                    <SelectItem value="it-consulting">IT Consulting</SelectItem>
-                    <SelectItem value="telco-consulting">Telco Consulting</SelectItem>
+                    <SelectItem value="it-consulting">IT consulting</SelectItem>
+                    <SelectItem value="telco-consulting">Telco consulting</SelectItem>
                     <SelectItem value="leadership">Leadership</SelectItem>
-                    <SelectItem value="pnl-optimization">P&L Optimization</SelectItem>
-                    <SelectItem value="others">Others</SelectItem>
+                    <SelectItem value="pnl-optimization">PnL optimisation</SelectItem>
+                    <SelectItem value="company-registration">Setting up a company in Sweden</SelectItem>
+                    <SelectItem value="others">others</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
