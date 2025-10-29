@@ -4,9 +4,9 @@ import { LogOut, Plus, Edit2, Trash2, Mail, Save } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { useToast } from '../hooks/use-toast';
-import { mockData } from '../mock';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { toast } from 'sonner';
+import { publicAPI, adminAPI, authAPI } from '../api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
