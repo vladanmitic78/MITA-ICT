@@ -81,7 +81,7 @@ const ContactUs = () => {
       if (window.grecaptcha && typeof window.grecaptcha.execute === 'function') {
         try {
           console.log('Executing reCAPTCHA...');
-          token = await window.grecaptcha.execute('6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3', { action: 'submit' });
+          token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' });
           console.log('reCAPTCHA token obtained');
         } catch (recaptchaError) {
           console.warn('reCAPTCHA execution failed:', recaptchaError);
