@@ -17,8 +17,26 @@ const ContactUs = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY || '6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3';
+
+  // Global error handler for this component
+  useEffect(() => {
+    const handleComponentError = (event) => {
+      if (event.reason) {
+        console.error('Unhandled promise rejection in ContactUs:', event.reason);
+        setHasError(true);
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('unhandledrejection', handleComponentError);
+
+    return () => {
+      window.removeEventListener('unhandledrejection', handleComponentError);
+    };
+  }, []);
 
   // Load reCAPTCHA script
   useEffect(() => {
