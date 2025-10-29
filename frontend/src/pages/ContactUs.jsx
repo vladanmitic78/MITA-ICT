@@ -139,10 +139,20 @@ const ContactUs = () => {
       const response = await publicAPI.submitContact({
         ...formData,
         recaptcha_token: token || 'no-token'
+      }).then(res => {
+        console.log('API call successful:', res);
+        return res;
       }).catch(apiError => {
-        console.error('API submission error:', apiError);
+        console.error('API submission error caught:', apiError);
+        if (!apiError) {
+          throw new Error('API call failed with null error');
+        }
         throw apiError;
       });
+      
+      if (!response) {
+        throw new Error('API returned null response');
+      }
       
       console.log('API response:', response);
       
