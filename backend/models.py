@@ -66,6 +66,10 @@ class AdminCreate(BaseModel):
     email: EmailStr
     password: str
 
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+
 class Admin(BaseModel):
     id: str
     username: str
