@@ -111,7 +111,7 @@ async def startup_db_client():
                 "id": "2",
                 "title": "Routing System",
                 "description": "Advanced routing system for telecommunications and network management.",
-                "link": "#",
+                "link": "https://trustcode.dev/",
                 "features": ["Smart Routing", "Real-time Monitoring", "Scalable Architecture", "API Access"],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
