@@ -250,18 +250,17 @@ const ContactUs = () => {
                       background: 'var(--bg-secondary)',
                       border: '1px solid var(--border-subtle)',
                       borderRadius: '0px',
-                      maxHeight: '300px',
+                      maxHeight: '400px',
                       overflowY: 'auto',
-                      zIndex: 9999,
-                      width: 'var(--radix-select-trigger-width)'
+                      zIndex: 99999
                     }}>
-                    <SelectItem value="saas">SaaS</SelectItem>
-                    <SelectItem value="it-consulting">IT consulting</SelectItem>
-                    <SelectItem value="telco-consulting">Telco consulting</SelectItem>
-                    <SelectItem value="leadership">Leadership</SelectItem>
-                    <SelectItem value="pnl-optimization">PnL optimisation</SelectItem>
-                    <SelectItem value="company-registration">Setting up a company in Sweden</SelectItem>
-                    <SelectItem value="others">others</SelectItem>
+                    <SelectItem value="saas" style={{ padding: '12px 16px', cursor: 'pointer' }}>SaaS</SelectItem>
+                    <SelectItem value="it-consulting" style={{ padding: '12px 16px', cursor: 'pointer' }}>IT consulting</SelectItem>
+                    <SelectItem value="telco-consulting" style={{ padding: '12px 16px', cursor: 'pointer' }}>Telco consulting</SelectItem>
+                    <SelectItem value="leadership" style={{ padding: '12px 16px', cursor: 'pointer' }}>Leadership</SelectItem>
+                    <SelectItem value="pnl-optimization" style={{ padding: '12px 16px', cursor: 'pointer' }}>PnL optimisation</SelectItem>
+                    <SelectItem value="company-registration" style={{ padding: '12px 16px', cursor: 'pointer' }}>Setting up a company in Sweden</SelectItem>
+                    <SelectItem value="others" style={{ padding: '12px 16px', cursor: 'pointer' }}>others</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
