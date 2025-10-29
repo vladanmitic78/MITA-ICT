@@ -246,7 +246,10 @@ const ContactUs = () => {
                   <SelectContent style={{
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--border-subtle)',
-                    borderRadius: '0px'
+                    borderRadius: '0px',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    zIndex: 9999
                   }}>
                     <SelectItem value="saas">SaaS</SelectItem>
                     <SelectItem value="it-consulting">IT consulting</SelectItem>
