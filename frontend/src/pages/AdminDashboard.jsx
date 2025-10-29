@@ -38,17 +38,22 @@ const AdminDashboard = () => {
         publicAPI.getSaasProducts(),
         adminAPI.getContacts()
       ]);
-      setServices(servicesRes.data);
-      setSaasProducts(productsRes.data);
-      setContacts(contactsRes.data);
+      setServices(servicesRes.data || []);
+      setSaasProducts(productsRes.data || []);
+      setContacts(contactsRes.data || []);
     } catch (error) {
       console.error('Error loading data:', error);
       if (error.response?.status === 401) {
         localStorage.removeItem('adminAuth');
         localStorage.removeItem('adminToken');
         navigate('/admin');
+      } else {
+        toast.error('Failed to load data');
+        // Set default empty arrays to prevent undefined errors
+        setServices([]);
+        setSaasProducts([]);
+        setContacts([]);
       }
-      toast.error('Failed to load data');
     } finally {
       setLoading(false);
     }
