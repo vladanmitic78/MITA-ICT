@@ -36,6 +36,9 @@ export const authAPI = {
 
 // Admin API
 export const adminAPI = {
+  // Admin API
+  changePassword: (data) => apiClient.post('/admin/change-password', data),
+  
   // Contacts
   getContacts: () => apiClient.get('/admin/contacts'),
   
