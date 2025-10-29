@@ -252,16 +252,15 @@ const ContactUs = () => {
                       borderRadius: '0px',
                       maxHeight: '400px',
                       overflowY: 'auto',
-                      zIndex: 99999,
-                      color: 'var(--text-primary)'
+                      zIndex: 99999
                     }}>
-                    <SelectItem value="saas" style={{ padding: '12px 16px', cursor: 'pointer', color: 'var(--text-primary)', background: 'var(--bg-secondary)' }}>SaaS</SelectItem>
-                    <SelectItem value="it-consulting" style={{ padding: '12px 16px', cursor: 'pointer', color: 'var(--text-primary)', background: 'var(--bg-secondary)' }}>IT consulting</SelectItem>
-                    <SelectItem value="telco-consulting" style={{ padding: '12px 16px', cursor: 'pointer', color: 'var(--text-primary)', background: 'var(--bg-secondary)' }}>Telco consulting</SelectItem>
-                    <SelectItem value="leadership" style={{ padding: '12px 16px', cursor: 'pointer', color: 'var(--text-primary)', background: 'var(--bg-secondary)' }}>Leadership</SelectItem>
-                    <SelectItem value="pnl-optimization" style={{ padding: '12px 16px', cursor: 'pointer', color: 'var(--text-primary)', background: 'var(--bg-secondary)' }}>PnL optimisation</SelectItem>
-                    <SelectItem value="company-registration" style={{ padding: '12px 16px', cursor: 'pointer', color: 'var(--text-primary)', background: 'var(--bg-secondary)' }}>Setting up a company in Sweden</SelectItem>
-                    <SelectItem value="others" style={{ padding: '12px 16px', cursor: 'pointer', color: 'var(--text-primary)', background: 'var(--bg-secondary)' }}>others</SelectItem>
+                    <SelectItem value="saas">SaaS</SelectItem>
+                    <SelectItem value="it-consulting">IT consulting</SelectItem>
+                    <SelectItem value="telco-consulting">Telco consulting</SelectItem>
+                    <SelectItem value="leadership">Leadership</SelectItem>
+                    <SelectItem value="pnl-optimization">PnL optimisation</SelectItem>
+                    <SelectItem value="company-registration">Setting up a company in Sweden</SelectItem>
+                    <SelectItem value="others">others</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
