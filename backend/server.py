@@ -250,6 +250,38 @@ async def admin_logout(current_user: dict = Depends(get_current_user)):
     logger.info(f"✅ Admin logged out: {current_user['username']}")
     return {"message": "Successfully logged out"}
 
+@api_router.post("/admin/change-password")
+async def change_password(
+    password_data: ChangePassword,
+    current_user: dict = Depends(get_current_user)
+):
+    """Change admin password"""
+    username = current_user['username']
+    admin = await db.admins.find_one({"username": username})
+    
+    if not admin:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Admin user not found"
+        )
+    
+    # Verify current password
+    if not verify_password(password_data.current_password, admin["password_hash"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current password is incorrect"
+        )
+    
+    # Update password
+    new_password_hash = get_password_hash(password_data.new_password)
+    await db.admins.update_one(
+        {"username": username},
+        {"$set": {"password_hash": new_password_hash}}
+    )
+    
+    logger.info(f"✅ Password changed for admin: {username}")
+    return {"message": "Password updated successfully"}
+
 # ==================== PROTECTED ADMIN ENDPOINTS ====================
 
 @api_router.get("/admin/contacts", response_model=List[Contact])
