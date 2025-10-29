@@ -36,11 +36,7 @@ const ContactUs = () => {
     
     // Validate reCAPTCHA
     if (!window.grecaptcha) {
-      toast({
-        title: 'Error',
-        description: 'reCAPTCHA not loaded. Please refresh the page.',
-        variant: 'destructive'
-      });
+      toast.error('reCAPTCHA not loaded. Please refresh the page.');
       return;
     }
 
@@ -49,13 +45,13 @@ const ContactUs = () => {
     try {
       const token = await window.grecaptcha.execute('6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3', { action: 'submit' });
       
-      // Mock submission for now
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: 'Success!',
-        description: 'Thank you for contacting us. We will get back to you soon.'
+      // Submit to API
+      await publicAPI.submitContact({
+        ...formData,
+        recaptcha_token: token
       });
+      
+      toast.success('Thank you for contacting us! We will get back to you soon.');
       
       // Reset form
       setFormData({
@@ -69,11 +65,8 @@ const ContactUs = () => {
       // Reset reCAPTCHA
       window.grecaptcha.reset();
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to submit form. Please try again.',
-        variant: 'destructive'
-      });
+      console.error('Form submission error:', error);
+      toast.error(error.response?.data?.detail || 'Failed to submit form. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
