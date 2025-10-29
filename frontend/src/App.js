@@ -42,9 +42,6 @@ function App() {
         <Footer />
         <Toaster />
       </BrowserRouter>
-      
-      {/* Load reCAPTCHA script */}
-      <script src="https://www.google.com/recaptcha/api.js?render=6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3" async defer></script>
     </div>
   );
 }
