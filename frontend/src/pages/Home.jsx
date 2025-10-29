@@ -10,6 +10,23 @@ const iconMap = {
 };
 
 const Home = () => {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await publicAPI.getServices();
+        setServices(response.data);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>
       {/* Hero Section */}
