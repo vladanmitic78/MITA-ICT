@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { publicAPI } from '../api';
 
 const ContactUs = () => {
-  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,7 +16,6 @@ const ContactUs = () => {
     comment: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
