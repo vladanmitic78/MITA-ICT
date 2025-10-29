@@ -13,6 +13,8 @@ const SaasStore = () => {
         setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
+        // Set empty array on error to prevent undefined issues
+        setProducts([]);
       } finally {
         setLoading(false);
       }
