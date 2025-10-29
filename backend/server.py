@@ -19,7 +19,7 @@ from auth import (
     verify_password, get_password_hash, create_access_token, 
     get_current_user, init_admin_user
 )
-from email_service import send_contact_email
+from email_service import send_contact_email, send_auto_response_email
 
 # Setup
 ROOT_DIR = Path(__file__).parent
