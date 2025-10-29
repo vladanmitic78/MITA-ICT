@@ -74,35 +74,45 @@ const Home = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
             gap: '40px'
           }}>
-            {mockData.services.map((service) => {
-              const IconComponent = iconMap[service.icon];
-              return (
-                <div
-                  key={service.id}
-                  className="dark-hover"
-                  style={{
-                    background: 'var(--bg-secondary)',
-                    padding: '40px',
-                    border: '1px solid var(--border-subtle)',
-                    transition: 'all 0.4s ease-in-out'
-                  }}
-                >
-                  <div style={{
-                    width: '60px',
-                    height: '60px',
-                    background: 'var(--brand-hover)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '24px'
-                  }}>
-                    <IconComponent size={32} color="var(--brand-primary)" />
+            {loading ? (
+              <p className="body-large" style={{ textAlign: 'center', gridColumn: '1 / -1' }}>
+                Loading services...
+              </p>
+            ) : services.length === 0 ? (
+              <p className="body-large" style={{ textAlign: 'center', gridColumn: '1 / -1' }}>
+                No services available
+              </p>
+            ) : (
+              services.map((service) => {
+                const IconComponent = iconMap[service.icon];
+                return (
+                  <div
+                    key={service.id}
+                    className="dark-hover"
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      padding: '40px',
+                      border: '1px solid var(--border-subtle)',
+                      transition: 'all 0.4s ease-in-out'
+                    }}
+                  >
+                    <div style={{
+                      width: '60px',
+                      height: '60px',
+                      background: 'var(--brand-hover)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '24px'
+                    }}>
+                      <IconComponent size={32} color="var(--brand-primary)" />
+                    </div>
+                    <h3 className="heading-1" style={{ marginBottom: '16px' }}>{service.title}</h3>
+                    <p className="body-medium">{service.description}</p>
                   </div>
-                  <h3 className="heading-1" style={{ marginBottom: '16px' }}>{service.title}</h3>
-                  <p className="body-medium">{service.description}</p>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       </section>
