@@ -60,24 +60,19 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(
         )
     return {"username": username}
 
-def init_admin_user(db, username: str = "admin", password: str = "admin123", email: str = "admin@mitaict.com"):
+async def init_admin_user(db, username: str = "admin", password: str = "admin123", email: str = "admin@mitaict.com"):
     """Initialize default admin user if not exists"""
-    import asyncio
-    
-    async def create_admin():
-        # Check if admin exists
-        existing_admin = await db.admins.find_one({"username": username})
-        if not existing_admin:
-            admin_data = {
-                "id": str(datetime.utcnow().timestamp()),
-                "username": username,
-                "email": email,
-                "password_hash": get_password_hash(password),
-                "created_at": datetime.utcnow()
-            }
-            await db.admins.insert_one(admin_data)
-            print(f"✅ Admin user created: {username}")
-        else:
-            print(f"✅ Admin user already exists: {username}")
-    
-    return asyncio.create_task(create_admin())
+    # Check if admin exists
+    existing_admin = await db.admins.find_one({"username": username})
+    if not existing_admin:
+        admin_data = {
+            "id": str(datetime.utcnow().timestamp()),
+            "username": username,
+            "email": email,
+            "password_hash": get_password_hash(password),
+            "created_at": datetime.utcnow()
+        }
+        await db.admins.insert_one(admin_data)
+        print(f"✅ Admin user created: {username}")
+    else:
+        print(f"✅ Admin user already exists: {username}")
