@@ -16,21 +16,33 @@ const ContactUs = () => {
     comment: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
 
   // Load reCAPTCHA script
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://www.google.com/recaptcha/api.js?render=6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3';
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
+    const loadRecaptcha = () => {
+      const script = document.createElement('script');
+      script.src = 'https://www.google.com/recaptcha/api.js?render=6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        console.log('reCAPTCHA script loaded');
+        setRecaptchaLoaded(true);
+      };
+      script.onerror = () => {
+        console.error('Failed to load reCAPTCHA script');
+      };
+      document.head.appendChild(script);
 
-    return () => {
-      // Cleanup
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
+      return () => {
+        // Cleanup
+        if (document.head.contains(script)) {
+          document.head.removeChild(script);
+        }
+      };
     };
+
+    loadRecaptcha();
   }, []);
 
   const handleChange = (e) => {
