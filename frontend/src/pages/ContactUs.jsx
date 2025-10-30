@@ -19,7 +19,7 @@ const ContactUs = () => {
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY || '6LdSFPsrAAAAAJIui51XHC_Bvlc6fhLkjzsE6_F3';
+  const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
 
   // Global error handler for this component
   useEffect(() => {
