@@ -42,6 +42,11 @@ const ContactUs = () => {
   useEffect(() => {
     const loadRecaptcha = async () => {
       try {
+        if (!RECAPTCHA_SITE_KEY) {
+          console.warn('reCAPTCHA site key not configured');
+          return;
+        }
+        
         const script = document.createElement('script');
         script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
         script.async = true;
