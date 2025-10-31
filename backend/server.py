@@ -418,6 +418,38 @@ async def delete_saas_product(
     logger.info(f"✅ SaaS product deleted: {product_id}")
     return {"message": "Product deleted successfully"}
 
+# About Content Management
+@api_router.put("/admin/about", response_model=AboutContent)
+async def update_about_content(
+    about: AboutContentUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update About page content (admin only)"""
+    existing_about = await db.about_content.find_one()
+    
+    if not existing_about:
+        # Create new about content if none exists
+        about_data = AboutContent(
+            title=about.title,
+            content=about.content
+        )
+        await db.about_content.insert_one(about_data.dict())
+        logger.info(f"✅ About content created")
+        return about_data
+    
+    # Update existing content
+    update_data = about.dict()
+    update_data["updated_at"] = datetime.utcnow()
+    
+    await db.about_content.update_one(
+        {"id": existing_about["id"]},
+        {"$set": update_data}
+    )
+    
+    updated_about = await db.about_content.find_one({"id": existing_about["id"]})
+    logger.info(f"✅ About content updated")
+    return AboutContent(**updated_about)
+
 # Include the router in the main app
 app.include_router(api_router)
 
