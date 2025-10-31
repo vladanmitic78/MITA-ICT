@@ -24,6 +24,7 @@ apiClient.interceptors.request.use((config) => {
 export const publicAPI = {
   getServices: () => apiClient.get('/services'),
   getSaasProducts: () => apiClient.get('/saas-products'),
+  getAboutContent: () => apiClient.get('/about'),
   submitContact: (data) => apiClient.post('/contact', data)
 };
 
