@@ -197,13 +197,13 @@ const ContactUs = () => {
   };
 
   return (
-    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>
+    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }} id="contact-page">
       {/* Hero Section */}
       <section style={{
         padding: '100px 7.6923%',
         textAlign: 'center',
         background: 'var(--bg-primary)'
-      }}>
+      }} id="contact-form-top">
         <h1 className="display-huge" style={{ marginBottom: '24px' }}>
           Get In Touch
         </h1>
@@ -222,7 +222,7 @@ const ContactUs = () => {
             background: 'var(--bg-secondary)',
             border: '1px solid var(--border-subtle)',
             padding: '40px'
-          }}>
+          }} id="contact-form">
             <form onSubmit={handleSubmit}>
               <style>{`
                 [data-radix-select-item] {
