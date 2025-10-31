@@ -137,6 +137,24 @@ async def startup_db_client():
             "id": "1",
             "title": "About MITA ICT",
             "content": "We bring over 20 years of distinguished experience in the IT and telecommunications industry. Our journey has been marked by successfully leading sales and engineering teams, implementing cutting-edge solutions, and driving organizational excellence.\n\nOur expertise spans across multiple domains including IT infrastructure, telecommunications networks, and enterprise software solutions. We have a proven track record in selling and implementing sophisticated software systems such as OSS (Operations Support Systems), OBS (Order and Billing Systems), and comprehensive cybersecurity solutions including EDR (Endpoint Detection and Response), MDR (Managed Detection and Response), and XDR (Extended Detection and Response).\n\nAt MITA ICT, client satisfaction is not just a goal—it's our foundation. We pride ourselves on understanding our clients' unique challenges and delivering tailored solutions that drive real business value. Our approach combines technical excellence with strategic thinking, ensuring that technology serves your business objectives.\n\nWhether you're looking to optimize your IT infrastructure, implement new telecommunications systems, or build high-performing teams, we bring the experience, expertise, and dedication to help you succeed.",
+            "expertise": [
+                {
+                    "title": "IT Infrastructure",
+                    "items": ["Network Design", "Cloud Solutions", "System Integration"]
+                },
+                {
+                    "title": "Telecommunications",
+                    "items": ["OSS Implementation", "Network Optimization", "Voice & Data Solutions"]
+                },
+                {
+                    "title": "Cybersecurity",
+                    "items": ["EDR/MDR/XDR Solutions", "Security Audits", "Compliance Management"]
+                },
+                {
+                    "title": "Leadership",
+                    "items": ["Team Building", "Sales Management", "P&L Optimization"]
+                }
+            ],
             "updated_at": datetime.utcnow()
         }
         await db.about_content.insert_one(default_about)
