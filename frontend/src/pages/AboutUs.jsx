@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Award, Users, Target, TrendingUp } from 'lucide-react';
-import { mockData } from '../mock';
+import { publicAPI } from '../api';
 
 const iconMap = {
   'Years of Experience': Award,
@@ -10,6 +10,35 @@ const iconMap = {
 };
 
 const AboutUs = () => {
+  const [aboutContent, setAboutContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Static stats (not editable)
+  const stats = [
+    { label: 'Years of Experience', value: '20+' },
+    { label: 'Successful Projects', value: '150+' },
+    { label: 'Industries Served', value: '15+' },
+    { label: 'Client Satisfaction', value: '98%' }
+  ];
+
+  useEffect(() => {
+    const fetchAboutContent = async () => {
+      try {
+        const response = await publicAPI.getAboutContent();
+        setAboutContent(response.data);
+      } catch (error) {
+        console.error('Error fetching about content:', error);
+        // Fallback content
+        setAboutContent({
+          title: 'About MITA ICT',
+          content: 'Loading content...'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAboutContent();
+  }, []);
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>
       {/* Hero Section */}
