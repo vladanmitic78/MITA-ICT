@@ -22,14 +22,38 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     // Check if user is authenticated
-    const isAuth = localStorage.getItem('adminAuth');
-    if (!isAuth) {
-      navigate('/admin');
-      return;
-    }
+    const checkAuth = () => {
+      try {
+        const isAuth = localStorage.getItem('adminAuth');
+        const token = localStorage.getItem('adminToken');
+        
+        console.log('🔐 Auth check in dashboard:', {
+          isAuth,
+          hasToken: !!token,
+          tokenLength: token?.length
+        });
+        
+        if (!isAuth || !token) {
+          console.log('❌ Not authenticated, redirecting to login');
+          toast.error('Please log in to access the dashboard');
+          navigate('/admin');
+          return false;
+        }
+        
+        console.log('✅ Authentication verified');
+        return true;
+      } catch (error) {
+        console.error('❌ Auth check error:', error);
+        toast.error('Authentication error. Please log in again.');
+        navigate('/admin');
+        return false;
+      }
+    };
     
-    // Load initial data
-    loadData();
+    if (checkAuth()) {
+      // Load initial data only if authenticated
+      loadData();
+    }
   }, [navigate]);
 
   const loadData = async () => {
