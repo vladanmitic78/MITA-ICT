@@ -51,7 +51,10 @@ export const adminAPI = {
   // SaaS Products
   createSaasProduct: (data) => apiClient.post('/admin/saas-products', data),
   updateSaasProduct: (id, data) => apiClient.put(`/admin/saas-products/${id}`, data),
-  deleteSaasProduct: (id) => apiClient.delete(`/admin/saas-products/${id}`)
+  deleteSaasProduct: (id) => apiClient.delete(`/admin/saas-products/${id}`),
+  
+  // About Content
+  updateAboutContent: (data) => apiClient.put('/admin/about', data)
 };
 
 export default apiClient;
