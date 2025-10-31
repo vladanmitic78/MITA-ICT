@@ -12,13 +12,55 @@ const apiClient = axios.create({
 });
 
 // Add token to requests if available
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('adminToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+apiClient.interceptors.request.use(
+  (config) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('✅ Token added to request:', config.url);
+      } else {
+        console.log('ℹ️ No token found for request:', config.url);
+      }
+    } catch (error) {
+      console.error('❌ Error accessing localStorage in interceptor:', error);
+    }
+    return config;
+  },
+  (error) => {
+    console.error('❌ Request interceptor error:', error);
+    return Promise.reject(error);
   }
-  return config;
-});
+);
+
+// Add response interceptor for better error handling
+apiClient.interceptors.response.use(
+  (response) => {
+    console.log('✅ API Response:', response.config.url, response.status);
+    return response;
+  },
+  (error) => {
+    console.error('❌ API Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.message,
+      data: error.response?.data
+    });
+    
+    // Handle 401 errors globally
+    if (error.response?.status === 401) {
+      console.log('🔓 Unauthorized - clearing auth data');
+      try {
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminAuth');
+      } catch (storageError) {
+        console.error('Error clearing storage:', storageError);
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
 // Public API
 export const publicAPI = {
