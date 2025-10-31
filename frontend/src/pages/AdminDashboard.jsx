@@ -192,7 +192,7 @@ const AdminDashboard = () => {
         padding: '0 7.6923%'
       }}>
         <div style={{ display: 'flex', gap: '32px' }}>
-          {['services', 'saas', 'contacts'].map(tab => (
+          {['services', 'saas', 'about', 'contacts'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
