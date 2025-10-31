@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, User, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -13,6 +13,33 @@ const AdminLogin = () => {
     username: '',
     password: ''
   });
+
+  // Check localStorage availability on mount
+  useEffect(() => {
+    const checkLocalStorage = () => {
+      try {
+        const testKey = '__test_localStorage__';
+        localStorage.setItem(testKey, 'test');
+        localStorage.removeItem(testKey);
+        console.log('✅ localStorage is available');
+        return true;
+      } catch (e) {
+        console.error('❌ localStorage is NOT available:', e);
+        toast.error('Your browser does not support localStorage. Please enable it or try a different browser.');
+        return false;
+      }
+    };
+    
+    checkLocalStorage();
+    
+    // Log browser info for debugging
+    console.log('Browser info:', {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      cookieEnabled: navigator.cookieEnabled,
+      onLine: navigator.onLine
+    });
+  }, []);
 
   const handleChange = (e) => {
     setCredentials({
