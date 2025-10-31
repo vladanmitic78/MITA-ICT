@@ -48,7 +48,7 @@ const AboutUs = () => {
         background: 'var(--bg-primary)'
       }}>
         <h1 className="display-huge" style={{ marginBottom: '24px' }}>
-          About MITA ICT
+          {loading ? 'Loading...' : aboutContent?.title || 'About MITA ICT'}
         </h1>
         <p className="body-large" style={{ color: 'var(--text-secondary)', maxWidth: '700px', margin: '0 auto' }}>
           Two decades of excellence in IT and telecommunications consulting.
@@ -66,7 +66,7 @@ const AboutUs = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
             gap: '40px'
           }}>
-            {mockData.aboutContent.stats.map((stat, index) => {
+            {stats.map((stat, index) => {
               const IconComponent = iconMap[stat.label];
               return (
                 <div key={index} style={{ textAlign: 'center' }}>
