@@ -26,14 +26,28 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
+      console.log('Login attempt:', { username: credentials.username });
       const response = await authAPI.login(credentials);
-      localStorage.setItem('adminToken', response.data.access_token);
-      localStorage.setItem('adminAuth', 'true');
-      toast.success('Welcome to the admin dashboard!');
-      navigate('/admin/dashboard');
+      console.log('Login response received:', response);
+      
+      if (response && response.data && response.data.access_token) {
+        localStorage.setItem('adminToken', response.data.access_token);
+        localStorage.setItem('adminAuth', 'true');
+        console.log('Token stored successfully');
+        toast.success('Welcome to the admin dashboard!');
+        navigate('/admin/dashboard');
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error(error.response?.data?.detail || 'Invalid username or password');
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        status: error.response?.status
+      });
+      const errorMessage = error.response?.data?.detail || error.message || 'Invalid username or password';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
