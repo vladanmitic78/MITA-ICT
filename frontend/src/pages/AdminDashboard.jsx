@@ -7,6 +7,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { toast } from 'sonner';
 import { publicAPI, adminAPI, authAPI } from '../api';
+import ExpertiseEditor from '../components/ExpertiseEditor';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
