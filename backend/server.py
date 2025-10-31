@@ -13,6 +13,7 @@ from models import (
     Service, ServiceCreate, ServiceUpdate,
     SaasProduct, SaasProductCreate, SaasProductUpdate,
     Contact, ContactCreate,
+    AboutContent, AboutContentUpdate,
     AdminLogin, Token, Admin, ChangePassword
 )
 from auth import (
