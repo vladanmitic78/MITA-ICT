@@ -60,11 +60,13 @@ class Contact(BaseModel):
 class AboutContentUpdate(BaseModel):
     title: str
     content: str
+    expertise: Optional[List[dict]] = []
 
 class AboutContent(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
     content: str
+    expertise: Optional[List[dict]] = []
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 # Admin Models
