@@ -398,7 +398,8 @@ const AdminDashboard = () => {
                         try {
                           await adminAPI.updateAboutContent({
                             title: aboutContent.title,
-                            content: aboutContent.content
+                            content: aboutContent.content,
+                            expertise: aboutContent.expertise || []
                           });
                           toast.success('About content updated successfully!');
                           loadData(); // Reload to get updated timestamp
