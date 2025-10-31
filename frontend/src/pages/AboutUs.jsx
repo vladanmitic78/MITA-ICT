@@ -99,13 +99,17 @@ const AboutUs = () => {
           <h2 className="display-large" style={{ marginBottom: '40px', textAlign: 'center' }}>
             Our Story
           </h2>
-          <div style={{ lineHeight: '1.8' }}>
-            {mockData.aboutContent.content.split('\n\n').map((paragraph, index) => (
-              <p key={index} className="body-large" style={{ marginBottom: '24px' }}>
-                {paragraph}
-              </p>
-            ))}
-          </div>
+          {loading ? (
+            <p className="body-large">Loading content...</p>
+          ) : (
+            <div style={{ lineHeight: '1.8' }}>
+              {aboutContent?.content.split('\n\n').map((paragraph, index) => (
+                <p key={index} className="body-large" style={{ marginBottom: '24px' }}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
