@@ -62,7 +62,19 @@ const Footer = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <Mail size={20} color="var(--brand-primary)" />
-              <span className="body-muted">info@mitaict.com</span>
+              <a 
+                href="mailto:info@mitaict.com" 
+                className="body-muted" 
+                style={{ 
+                  textDecoration: 'none', 
+                  color: 'var(--text-muted)',
+                  transition: 'color 0.3s'
+                }}
+                onMouseEnter={(e) => e.target.style.color = 'var(--brand-primary)'}
+                onMouseLeave={(e) => e.target.style.color = 'var(--text-muted)'}
+              >
+                info@mitaict.com
+              </a>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <MapPin size={20} color="var(--brand-primary)" />
