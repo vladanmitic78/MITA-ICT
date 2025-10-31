@@ -167,6 +167,14 @@ async def get_saas_products():
     products = await db.saas_products.find().to_list(1000)
     return [SaasProduct(**product) for product in products]
 
+@api_router.get("/about", response_model=AboutContent)
+async def get_about_content():
+    """Get About page content"""
+    about = await db.about_content.find_one()
+    if not about:
+        raise HTTPException(status_code=404, detail="About content not found")
+    return AboutContent(**about)
+
 @api_router.post("/contact", response_model=dict)
 async def submit_contact(contact: ContactCreate):
     """Submit contact form"""
