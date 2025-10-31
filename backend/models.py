@@ -56,6 +56,17 @@ class Contact(BaseModel):
     comment: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# About Content Models
+class AboutContentUpdate(BaseModel):
+    title: str
+    content: str
+
+class AboutContent(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    content: str
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Admin Models
 class AdminLogin(BaseModel):
     username: str
