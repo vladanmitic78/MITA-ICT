@@ -331,6 +331,86 @@ const AdminDashboard = () => {
               </div>
             )}
 
+            {activeTab === 'about' && (
+              <div>
+                <div style={{ marginBottom: '32px' }}>
+                  <h2 className="heading-1">About Page Content</h2>
+                  <p className="body-medium" style={{ color: 'var(--text-muted)', marginTop: '8px' }}>
+                    Edit the content displayed on the About Us page
+                  </p>
+                </div>
+                {aboutContent && (
+                  <div style={{
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '40px'
+                  }}>
+                    <div style={{ marginBottom: '24px' }}>
+                      <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>
+                        Page Title
+                      </label>
+                      <Input
+                        value={aboutContent.title}
+                        onChange={(e) => setAboutContent({ ...aboutContent, title: e.target.value })}
+                        style={{
+                          background: 'var(--bg-primary)',
+                          border: '1px solid var(--border-subtle)',
+                          color: 'var(--text-primary)',
+                          borderRadius: '0px',
+                          padding: '14px',
+                          fontSize: '16px'
+                        }}
+                      />
+                    </div>
+                    
+                    <div style={{ marginBottom: '32px' }}>
+                      <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>
+                        Content
+                      </label>
+                      <Textarea
+                        value={aboutContent.content}
+                        onChange={(e) => setAboutContent({ ...aboutContent, content: e.target.value })}
+                        rows={15}
+                        style={{
+                          background: 'var(--bg-primary)',
+                          border: '1px solid var(--border-subtle)',
+                          color: 'var(--text-primary)',
+                          borderRadius: '0px',
+                          padding: '14px',
+                          fontSize: '16px',
+                          lineHeight: '1.6'
+                        }}
+                      />
+                      <p className="body-muted" style={{ fontSize: '14px', marginTop: '8px' }}>
+                        Use double line breaks (press Enter twice) to separate paragraphs
+                      </p>
+                    </div>
+                    
+                    <Button 
+                      onClick={async () => {
+                        try {
+                          await adminAPI.updateAboutContent({
+                            title: aboutContent.title,
+                            content: aboutContent.content
+                          });
+                          toast.success('About content updated successfully!');
+                          loadData(); // Reload to get updated timestamp
+                        } catch (error) {
+                          console.error('Update error:', error);
+                          toast.error(error.response?.data?.detail || 'Failed to update content');
+                        }
+                      }}
+                      className="btn-primary" 
+                      style={{ width: '100%' }}
+                    >
+                      <Save size={20} />
+                      Save Changes
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {activeTab === 'contacts' && (
               <div>
                 <div style={{ marginBottom: '32px' }}>
