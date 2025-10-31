@@ -52,28 +52,85 @@ const AdminLogin = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Check localStorage before attempting login
     try {
-      console.log('Login attempt:', { username: credentials.username });
+      const testKey = '__test_localStorage__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+    } catch (storageError) {
+      console.error('localStorage test failed:', storageError);
+      toast.error('Unable to access browser storage. Please check your browser settings.');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      console.log('🔐 Login attempt started');
+      console.log('Username:', credentials.username);
+      console.log('API URL:', process.env.REACT_APP_BACKEND_URL);
+      
       const response = await authAPI.login(credentials);
-      console.log('Login response received:', response);
+      console.log('✅ Login response received:', {
+        hasData: !!response?.data,
+        hasToken: !!response?.data?.access_token,
+        responseStatus: response?.status
+      });
       
       if (response && response.data && response.data.access_token) {
-        localStorage.setItem('adminToken', response.data.access_token);
-        localStorage.setItem('adminAuth', 'true');
-        console.log('Token stored successfully');
-        toast.success('Welcome to the admin dashboard!');
-        navigate('/admin/dashboard');
+        const token = response.data.access_token;
+        
+        // Store token with additional error handling
+        try {
+          localStorage.setItem('adminToken', token);
+          localStorage.setItem('adminAuth', 'true');
+          
+          // Verify token was stored
+          const storedToken = localStorage.getItem('adminToken');
+          if (storedToken !== token) {
+            throw new Error('Token storage verification failed');
+          }
+          
+          console.log('✅ Token stored and verified successfully');
+          toast.success('Welcome to the admin dashboard!');
+          
+          // Small delay to ensure state is saved
+          setTimeout(() => {
+            navigate('/admin/dashboard');
+          }, 100);
+          
+        } catch (storageError) {
+          console.error('❌ Token storage failed:', storageError);
+          toast.error('Failed to save login session. Please check your browser settings.');
+          throw storageError;
+        }
       } else {
+        console.error('❌ Invalid response structure:', response);
         throw new Error('Invalid response from server');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       console.error('Error details:', {
         message: error.message,
-        response: error.response,
-        status: error.response?.status
+        response: error.response?.data,
+        status: error.response?.status,
+        headers: error.response?.headers,
+        config: error.config
       });
-      const errorMessage = error.response?.data?.detail || error.message || 'Invalid username or password';
+      
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (error.response) {
+        // Server responded with error
+        errorMessage = error.response.data?.detail || `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        // Request made but no response
+        console.error('No response received from server');
+        errorMessage = 'Cannot connect to server. Please check your internet connection.';
+      } else {
+        // Error in request setup
+        errorMessage = error.message || 'An unexpected error occurred';
+      }
+      
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
