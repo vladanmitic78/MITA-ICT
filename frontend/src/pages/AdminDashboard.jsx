@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [services, setServices] = useState([]);
   const [saasProducts, setSaasProducts] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [aboutContent, setAboutContent] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [loading, setLoading] = useState(true);
