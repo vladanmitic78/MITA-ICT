@@ -387,6 +387,12 @@ const AdminDashboard = () => {
                       </p>
                     </div>
                     
+                    {/* Expertise Editor */}
+                    <ExpertiseEditor
+                      expertise={aboutContent.expertise || []}
+                      onChange={(newExpertise) => setAboutContent({ ...aboutContent, expertise: newExpertise })}
+                    />
+                    
                     <Button 
                       onClick={async () => {
                         try {
