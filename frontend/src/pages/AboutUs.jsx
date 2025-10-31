@@ -123,35 +123,62 @@ const AboutUs = () => {
           <h2 className="display-large" style={{ marginBottom: '40px' }}>
             Our Expertise
           </h2>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '30px',
-            textAlign: 'left'
-          }}>
-            {[
-              { title: 'IT Infrastructure', items: ['Network Design', 'Cloud Solutions', 'System Integration'] },
-              { title: 'Telecommunications', items: ['OSS Implementation', 'Network Optimization', 'Voice & Data Solutions'] },
-              { title: 'Cybersecurity', items: ['EDR/MDR/XDR Solutions', 'Security Audits', 'Compliance Management'] },
-              { title: 'Leadership', items: ['Team Building', 'Sales Management', 'P&L Optimization'] }
-            ].map((area, index) => (
-              <div key={index} style={{
-                background: 'var(--bg-primary)',
-                padding: '30px',
-                border: '1px solid var(--border-subtle)'
-              }}>
-                <h3 className="heading-1" style={{ marginBottom: '16px' }}>{area.title}</h3>
-                <ul style={{ listStyle: 'none', padding: 0 }}>
-                  {area.items.map((item, i) => (
-                    <li key={i} className="body-medium" style={{ marginBottom: '8px', paddingLeft: '20px', position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: 0, color: 'var(--brand-primary)' }}>→</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          {loading || !aboutContent?.expertise || aboutContent.expertise.length === 0 ? (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '30px',
+              textAlign: 'left'
+            }}>
+              {[
+                { title: 'IT Infrastructure', items: ['Network Design', 'Cloud Solutions', 'System Integration'] },
+                { title: 'Telecommunications', items: ['OSS Implementation', 'Network Optimization', 'Voice & Data Solutions'] },
+                { title: 'Cybersecurity', items: ['EDR/MDR/XDR Solutions', 'Security Audits', 'Compliance Management'] },
+                { title: 'Leadership', items: ['Team Building', 'Sales Management', 'P&L Optimization'] }
+              ].map((area, index) => (
+                <div key={index} style={{
+                  background: 'var(--bg-primary)',
+                  padding: '30px',
+                  border: '1px solid var(--border-subtle)'
+                }}>
+                  <h3 className="heading-1" style={{ marginBottom: '16px' }}>{area.title}</h3>
+                  <ul style={{ listStyle: 'none', padding: 0 }}>
+                    {area.items.map((item, i) => (
+                      <li key={i} className="body-medium" style={{ marginBottom: '8px', paddingLeft: '20px', position: 'relative' }}>
+                        <span style={{ position: 'absolute', left: 0, color: 'var(--brand-primary)' }}>→</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '30px',
+              textAlign: 'left'
+            }}>
+              {aboutContent.expertise.map((area, index) => (
+                <div key={index} style={{
+                  background: 'var(--bg-primary)',
+                  padding: '30px',
+                  border: '1px solid var(--border-subtle)'
+                }}>
+                  <h3 className="heading-1" style={{ marginBottom: '16px' }}>{area.title}</h3>
+                  <ul style={{ listStyle: 'none', padding: 0 }}>
+                    {area.items && area.items.map((item, i) => (
+                      <li key={i} className="body-medium" style={{ marginBottom: '8px', paddingLeft: '20px', position: 'relative' }}>
+                        <span style={{ position: 'absolute', left: 0, color: 'var(--brand-primary)' }}>→</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>
