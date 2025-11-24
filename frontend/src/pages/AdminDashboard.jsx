@@ -649,34 +649,65 @@ const AdminDashboard = () => {
                       <div key={contact.id} style={{
                         background: 'var(--bg-secondary)',
                         border: '1px solid var(--border-subtle)',
-                        padding: '24px'
+                        padding: '24px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'start'
                       }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                          <div>
-                            <span className="body-muted" style={{ fontSize: '14px' }}>Name:</span>
-                            <p className="body-medium">{contact.name}</p>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                            <div>
+                              <span className="body-muted" style={{ fontSize: '14px' }}>Name:</span>
+                              <p className="body-medium">{contact.name}</p>
+                            </div>
+                            <div>
+                              <span className="body-muted" style={{ fontSize: '14px' }}>Email:</span>
+                              <p className="body-medium">{contact.email}</p>
+                            </div>
+                            <div>
+                              <span className="body-muted" style={{ fontSize: '14px' }}>Phone:</span>
+                              <p className="body-medium">{contact.phone}</p>
+                            </div>
+                            <div>
+                              <span className="body-muted" style={{ fontSize: '14px' }}>Service:</span>
+                              <p className="body-medium">{contact.service}</p>
+                            </div>
                           </div>
                           <div>
-                            <span className="body-muted" style={{ fontSize: '14px' }}>Email:</span>
-                            <p className="body-medium">{contact.email}</p>
+                            <span className="body-muted" style={{ fontSize: '14px' }}>Comment:</span>
+                            <p className="body-medium" style={{ marginTop: '8px' }}>{contact.comment || 'No comment provided'}</p>
                           </div>
-                          <div>
-                            <span className="body-muted" style={{ fontSize: '14px' }}>Phone:</span>
-                            <p className="body-medium">{contact.phone}</p>
-                          </div>
-                          <div>
-                            <span className="body-muted" style={{ fontSize: '14px' }}>Service:</span>
-                            <p className="body-medium">{contact.service}</p>
+                          <div style={{ marginTop: '12px' }}>
+                            <span className="body-muted" style={{ fontSize: '12px' }}>
+                              Submitted: {new Date(contact.created_at).toLocaleString()}
+                            </span>
                           </div>
                         </div>
-                        <div>
-                          <span className="body-muted" style={{ fontSize: '14px' }}>Comment:</span>
-                          <p className="body-medium" style={{ marginTop: '8px' }}>{contact.comment || 'No comment provided'}</p>
-                        </div>
-                        <div style={{ marginTop: '12px' }}>
-                          <span className="body-muted" style={{ fontSize: '12px' }}>
-                            Submitted: {new Date(contact.created_at).toLocaleString()}
-                          </span>
+                        <div style={{ display: 'flex', gap: '12px', marginLeft: '20px' }}>
+                          <button
+                            onClick={() => handleEdit(contact, 'contact')}
+                            style={{
+                              background: 'var(--brand-hover)',
+                              border: 'none',
+                              padding: '10px',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s'
+                            }}
+                          >
+                            <Edit2 size={20} color="var(--brand-primary)" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(contact.id, 'contact')}
+                            style={{
+                              background: 'rgba(255, 0, 0, 0.1)',
+                              border: 'none',
+                              padding: '10px',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s'
+                            }}
+                          >
+                            <Trash2 size={20} color="#ff4444" />
+                          </button>
                         </div>
                       </div>
                     ))}
