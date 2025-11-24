@@ -518,10 +518,98 @@ const AdminDashboard = () => {
                 <div style={{ marginBottom: '32px' }}>
                   <h2 className="heading-1">Contact Submissions</h2>
                   <p className="body-medium" style={{ color: 'var(--text-muted)', marginTop: '8px' }}>
-                    All contact form submissions
+                    All contact form submissions ({contacts.length} total)
                   </p>
                 </div>
-                {contacts.length === 0 ? (
+
+                {/* Search and Export Controls */}
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '16px', 
+                  marginBottom: '24px',
+                  flexWrap: 'wrap',
+                  alignItems: 'center'
+                }}>
+                  {/* Search Bar */}
+                  <div style={{ flex: '1', minWidth: '300px', position: 'relative' }}>
+                    <Search 
+                      size={20} 
+                      color="var(--text-muted)" 
+                      style={{ 
+                        position: 'absolute', 
+                        left: '14px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)'
+                      }} 
+                    />
+                    <Input
+                      type="text"
+                      placeholder="Search by name, email, phone, service, or comment..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                        borderRadius: '0px',
+                        padding: '14px 14px 14px 44px',
+                        fontSize: '16px',
+                        width: '100%'
+                      }}
+                    />
+                  </div>
+
+                  {/* Download Buttons */}
+                  <Button 
+                    onClick={handleDownloadPDF}
+                    className="btn-secondary"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                      padding: '14px 20px'
+                    }}
+                  >
+                    <FileText size={20} />
+                    Export PDF
+                  </Button>
+
+                  <Button 
+                    onClick={handleDownloadExcel}
+                    className="btn-secondary"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                      padding: '14px 20px'
+                    }}
+                  >
+                    <FileSpreadsheet size={20} />
+                    Export Excel
+                  </Button>
+                </div>
+
+                {/* Search Results Info */}
+                {searchQuery && (
+                  <div style={{ 
+                    marginBottom: '16px',
+                    padding: '12px',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-subtle)'
+                  }}>
+                    <p className="body-medium" style={{ color: 'var(--text-primary)' }}>
+                      Found {filteredContacts.length} result{filteredContacts.length !== 1 ? 's' : ''} for "{searchQuery}"
+                    </p>
+                  </div>
+                )}
+
+                {filteredContacts.length === 0 ? (
                   <div style={{
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--border-subtle)',
@@ -529,11 +617,13 @@ const AdminDashboard = () => {
                     textAlign: 'center'
                   }}>
                     <Mail size={48} color="var(--text-muted)" style={{ margin: '0 auto 20px' }} />
-                    <p className="body-large" style={{ color: 'var(--text-muted)' }}>No contact submissions yet</p>
+                    <p className="body-large" style={{ color: 'var(--text-muted)' }}>
+                      {searchQuery ? 'No contacts found matching your search' : 'No contact submissions yet'}
+                    </p>
                   </div>
                 ) : (
                   <div style={{ display: 'grid', gap: '24px' }}>
-                    {contacts.map((contact) => (
+                    {filteredContacts.map((contact) => (
                       <div key={contact.id} style={{
                         background: 'var(--bg-secondary)',
                         border: '1px solid var(--border-subtle)',
