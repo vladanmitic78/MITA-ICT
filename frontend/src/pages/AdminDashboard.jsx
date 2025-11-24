@@ -149,6 +149,16 @@ const AdminDashboard = () => {
           setSaasProducts([...saasProducts, response.data]);
           toast.success('Product created successfully!');
         }
+      } else if (editingItem.type === 'contact') {
+        await adminAPI.updateContact(editingItem.id, {
+          name: editingItem.name,
+          email: editingItem.email,
+          phone: editingItem.phone,
+          service: editingItem.service,
+          comment: editingItem.comment
+        });
+        setContacts(contacts.map(c => c.id === editingItem.id ? editingItem : c));
+        toast.success('Contact updated successfully!');
       }
       
       setIsEditDialogOpen(false);
@@ -160,11 +170,14 @@ const AdminDashboard = () => {
   };
 
   const handleDelete = async (id, type) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) {
-      return;
-    }
+    setItemToDelete({ id, type });
+    setDeleteConfirmOpen(true);
+  };
 
+  const confirmDelete = async () => {
     try {
+      const { id, type } = itemToDelete;
+      
       if (type === 'service') {
         await adminAPI.deleteService(id);
         setServices(services.filter(s => s.id !== id));
@@ -173,7 +186,14 @@ const AdminDashboard = () => {
         await adminAPI.deleteSaasProduct(id);
         setSaasProducts(saasProducts.filter(p => p.id !== id));
         toast.success('Product deleted successfully!');
+      } else if (type === 'contact') {
+        await adminAPI.deleteContact(id);
+        setContacts(contacts.filter(c => c.id !== id));
+        toast.success('Contact deleted successfully!');
       }
+      
+      setDeleteConfirmOpen(false);
+      setItemToDelete(null);
     } catch (error) {
       console.error('Delete error:', error);
       toast.error(error.response?.data?.detail || 'Failed to delete item');
