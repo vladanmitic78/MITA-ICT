@@ -357,6 +357,44 @@ async def get_contacts(current_user: dict = Depends(get_current_user)):
     contacts = await db.contacts.find().sort("created_at", -1).to_list(1000)
     return [Contact(**contact) for contact in contacts]
 
+
+# Contact Management
+@api_router.put("/admin/contacts/{contact_id}", response_model=Contact)
+async def update_contact(
+    contact_id: str,
+    contact: ContactUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update contact (admin only)"""
+    existing_contact = await db.contacts.find_one({"id": contact_id})
+    if not existing_contact:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    
+    update_data = contact.dict()
+    
+    await db.contacts.update_one(
+        {"id": contact_id},
+        {"$set": update_data}
+    )
+    
+    updated_contact = await db.contacts.find_one({"id": contact_id})
+    logger.info(f"✅ Contact updated: {contact_id}")
+    return Contact(**updated_contact)
+
+@api_router.delete("/admin/contacts/{contact_id}")
+async def delete_contact(
+    contact_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete contact (admin only)"""
+    result = await db.contacts.delete_one({"id": contact_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    
+    logger.info(f"✅ Contact deleted: {contact_id}")
+    return {"message": "Contact deleted successfully"}
+
+
 # Service Management
 @api_router.post("/admin/services", response_model=Service)
 async def create_service(
