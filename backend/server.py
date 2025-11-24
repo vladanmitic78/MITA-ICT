@@ -21,7 +21,7 @@ from openpyxl.styles import Font, Alignment, PatternFill
 from models import (
     Service, ServiceCreate, ServiceUpdate,
     SaasProduct, SaasProductCreate, SaasProductUpdate,
-    Contact, ContactCreate,
+    Contact, ContactCreate, ContactUpdate,
     AboutContent, AboutContentUpdate,
     AdminLogin, Token, Admin, ChangePassword
 )
