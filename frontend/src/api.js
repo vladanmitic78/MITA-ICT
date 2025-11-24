@@ -84,6 +84,8 @@ export const adminAPI = {
   
   // Contacts
   getContacts: () => apiClient.get('/admin/contacts'),
+  updateContact: (id, data) => apiClient.put(`/admin/contacts/${id}`, data),
+  deleteContact: (id) => apiClient.delete(`/admin/contacts/${id}`),
   
   // Services
   createService: (data) => apiClient.post('/admin/services', data),
