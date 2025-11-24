@@ -729,58 +729,144 @@ const AdminDashboard = () => {
         }}>
           <DialogHeader>
             <DialogTitle className="heading-1">
-              {editingItem && services.find(s => s.id === editingItem.id) ? 'Edit' : 'Add'} {editingItem?.type === 'service' ? 'Service' : 'Product'}
+              {editingItem?.type === 'contact' ? 'Edit Contact' : 
+               editingItem && services.find(s => s.id === editingItem.id) ? 'Edit' : 'Add'} 
+              {editingItem?.type === 'service' ? ' Service' : editingItem?.type === 'saas' ? ' Product' : ''}
             </DialogTitle>
           </DialogHeader>
           {editingItem && (
             <div style={{ marginTop: '24px' }}>
-              <div style={{ marginBottom: '20px' }}>
-                <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Title</label>
-                <Input
-                  value={editingItem.title}
-                  onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
-                  style={{
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border-subtle)',
-                    color: 'var(--text-primary)',
-                    borderRadius: '0px',
-                    padding: '14px',
-                    fontSize: '16px'
-                  }}
-                />
-              </div>
-              <div style={{ marginBottom: '20px' }}>
-                <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Description</label>
-                <Textarea
-                  value={editingItem.description}
-                  onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                  rows={4}
-                  style={{
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border-subtle)',
-                    color: 'var(--text-primary)',
-                    borderRadius: '0px',
-                    padding: '14px',
-                    fontSize: '16px'
-                  }}
-                />
-              </div>
-              {editingItem.type === 'saas' && (
-                <div style={{ marginBottom: '20px' }}>
-                  <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Link</label>
-                  <Input
-                    value={editingItem.link}
-                    onChange={(e) => setEditingItem({ ...editingItem, link: e.target.value })}
-                    style={{
-                      background: 'var(--bg-primary)',
-                      border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)',
-                      borderRadius: '0px',
-                      padding: '14px',
-                      fontSize: '16px'
-                    }}
-                  />
-                </div>
+              {editingItem.type === 'contact' ? (
+                <>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Name</label>
+                    <Input
+                      value={editingItem.name}
+                      onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                        borderRadius: '0px',
+                        padding: '14px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Email</label>
+                    <Input
+                      type="email"
+                      value={editingItem.email}
+                      onChange={(e) => setEditingItem({ ...editingItem, email: e.target.value })}
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                        borderRadius: '0px',
+                        padding: '14px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Phone</label>
+                    <Input
+                      value={editingItem.phone}
+                      onChange={(e) => setEditingItem({ ...editingItem, phone: e.target.value })}
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                        borderRadius: '0px',
+                        padding: '14px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Service</label>
+                    <Input
+                      value={editingItem.service}
+                      onChange={(e) => setEditingItem({ ...editingItem, service: e.target.value })}
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                        borderRadius: '0px',
+                        padding: '14px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Comment</label>
+                    <Textarea
+                      value={editingItem.comment}
+                      onChange={(e) => setEditingItem({ ...editingItem, comment: e.target.value })}
+                      rows={4}
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                        borderRadius: '0px',
+                        padding: '14px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Title</label>
+                    <Input
+                      value={editingItem.title}
+                      onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                        borderRadius: '0px',
+                        padding: '14px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Description</label>
+                    <Textarea
+                      value={editingItem.description}
+                      onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
+                      rows={4}
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                        borderRadius: '0px',
+                        padding: '14px',
+                        fontSize: '16px'
+                      }}
+                    />
+                  </div>
+                  {editingItem.type === 'saas' && (
+                    <div style={{ marginBottom: '20px' }}>
+                      <label className="body-medium" style={{ display: 'block', marginBottom: '8px' }}>Link</label>
+                      <Input
+                        value={editingItem.link}
+                        onChange={(e) => setEditingItem({ ...editingItem, link: e.target.value })}
+                        style={{
+                          background: 'var(--bg-primary)',
+                          border: '1px solid var(--border-subtle)',
+                          color: 'var(--text-primary)',
+                          borderRadius: '0px',
+                          padding: '14px',
+                          fontSize: '16px'
+                        }}
+                      />
+                    </div>
+                  )}
+                </>
               )}
               <Button onClick={handleSave} className="btn-primary" style={{ width: '100%' }}>
                 <Save size={20} />
@@ -788,6 +874,50 @@ const AdminDashboard = () => {
               </Button>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-subtle)',
+          maxWidth: '500px',
+          padding: '32px'
+        }}>
+          <DialogHeader>
+            <DialogTitle className="heading-1" style={{ color: '#ff4444' }}>
+              Confirm Delete
+            </DialogTitle>
+          </DialogHeader>
+          <div style={{ marginTop: '24px' }}>
+            <p className="body-large" style={{ marginBottom: '24px' }}>
+              Are you sure you want to delete this {itemToDelete?.type}? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <Button 
+                onClick={() => {
+                  setDeleteConfirmOpen(false);
+                  setItemToDelete(null);
+                }}
+                className="btn-secondary" 
+                style={{ flex: 1 }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={confirmDelete}
+                style={{ 
+                  flex: 1,
+                  background: '#ff4444',
+                  color: 'white'
+                }}
+              >
+                <Trash2 size={20} />
+                Delete
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
