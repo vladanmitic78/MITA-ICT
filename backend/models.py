@@ -47,6 +47,13 @@ class ContactCreate(BaseModel):
     comment: str = ""
     recaptcha_token: str
 
+class ContactUpdate(BaseModel):
+    name: str
+    email: str
+    phone: str
+    service: str
+    comment: str = ""
+
 class Contact(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
