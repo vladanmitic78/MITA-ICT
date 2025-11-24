@@ -477,6 +477,208 @@ async def update_about_content(
     logger.info(f"✅ About content updated")
     return AboutContent(**updated_about)
 
+# Export Endpoints
+@api_router.get("/admin/contacts/export/pdf")
+async def export_contacts_pdf(current_user: dict = Depends(get_current_user)):
+    """Export contacts to PDF (admin only)"""
+    try:
+        contacts = await db.contacts.find().sort("created_at", -1).to_list(1000)
+        
+        # Create PDF in memory
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=50, bottomMargin=30)
+        
+        # Container for the 'Flowable' objects
+        elements = []
+        
+        # Add title
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            textColor=colors.HexColor('#00D9FF'),
+            spaceAfter=30,
+            alignment=1  # Center alignment
+        )
+        title = Paragraph("MITA ICT - Contact Submissions", title_style)
+        elements.append(title)
+        elements.append(Spacer(1, 12))
+        
+        # Add export date
+        date_style = ParagraphStyle(
+            'DateStyle',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor=colors.grey,
+            alignment=1
+        )
+        export_date = Paragraph(f"Exported on: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}", date_style)
+        elements.append(export_date)
+        elements.append(Spacer(1, 20))
+        
+        if contacts:
+            # Prepare table data
+            table_data = [['Name', 'Email', 'Phone', 'Service', 'Date']]
+            
+            for contact in contacts:
+                created_at = contact.get('created_at', datetime.utcnow())
+                if isinstance(created_at, str):
+                    created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                
+                table_data.append([
+                    contact.get('name', 'N/A'),
+                    contact.get('email', 'N/A'),
+                    contact.get('phone', 'N/A'),
+                    contact.get('service', 'N/A'),
+                    created_at.strftime('%Y-%m-%d')
+                ])
+            
+            # Create table
+            table = Table(table_data, colWidths=[1.5*inch, 2*inch, 1.5*inch, 1.5*inch, 1*inch])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#00D9FF')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 10),
+                ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f5f5')]),
+            ]))
+            elements.append(table)
+            
+            # Add details section for comments
+            elements.append(Spacer(1, 30))
+            details_title = Paragraph("<b>Contact Details with Comments:</b>", styles['Heading2'])
+            elements.append(details_title)
+            elements.append(Spacer(1, 12))
+            
+            for i, contact in enumerate(contacts, 1):
+                detail_style = styles['Normal']
+                detail_text = f"""
+                <b>{i}. {contact.get('name', 'N/A')}</b><br/>
+                Email: {contact.get('email', 'N/A')}<br/>
+                Phone: {contact.get('phone', 'N/A')}<br/>
+                Service: {contact.get('service', 'N/A')}<br/>
+                Comment: {contact.get('comment', 'No comment provided')}<br/>
+                Date: {created_at.strftime('%Y-%m-%d %H:%M')}
+                """
+                elements.append(Paragraph(detail_text, detail_style))
+                elements.append(Spacer(1, 15))
+        else:
+            no_data = Paragraph("No contact submissions available.", styles['Normal'])
+            elements.append(no_data)
+        
+        # Build PDF
+        doc.build(elements)
+        buffer.seek(0)
+        
+        logger.info(f"✅ PDF export generated: {len(contacts)} contacts")
+        
+        return StreamingResponse(
+            buffer,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename=mita_contacts_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.pdf"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ PDF export failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate PDF: {str(e)}"
+        )
+
+@api_router.get("/admin/contacts/export/excel")
+async def export_contacts_excel(current_user: dict = Depends(get_current_user)):
+    """Export contacts to Excel (admin only)"""
+    try:
+        contacts = await db.contacts.find().sort("created_at", -1).to_list(1000)
+        
+        # Create Excel workbook
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Contacts"
+        
+        # Add title
+        ws.merge_cells('A1:F1')
+        title_cell = ws['A1']
+        title_cell.value = 'MITA ICT - Contact Submissions'
+        title_cell.font = Font(size=16, bold=True, color="000000")
+        title_cell.alignment = Alignment(horizontal='center', vertical='center')
+        title_cell.fill = PatternFill(start_color="00D9FF", end_color="00D9FF", fill_type="solid")
+        
+        # Add export date
+        ws.merge_cells('A2:F2')
+        date_cell = ws['A2']
+        date_cell.value = f"Exported on: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}"
+        date_cell.font = Font(size=10, italic=True)
+        date_cell.alignment = Alignment(horizontal='center')
+        
+        # Add headers
+        headers = ['Name', 'Email', 'Phone', 'Service', 'Comment', 'Submitted Date']
+        ws.append([])  # Empty row
+        ws.append(headers)
+        
+        # Style headers
+        header_row = ws[4]
+        for cell in header_row:
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = PatternFill(start_color="333333", end_color="333333", fill_type="solid")
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+        
+        # Add data
+        for contact in contacts:
+            created_at = contact.get('created_at', datetime.utcnow())
+            if isinstance(created_at, str):
+                created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+            
+            ws.append([
+                contact.get('name', 'N/A'),
+                contact.get('email', 'N/A'),
+                contact.get('phone', 'N/A'),
+                contact.get('service', 'N/A'),
+                contact.get('comment', 'No comment provided'),
+                created_at.strftime('%Y-%m-%d %H:%M')
+            ])
+        
+        # Adjust column widths
+        ws.column_dimensions['A'].width = 20
+        ws.column_dimensions['B'].width = 30
+        ws.column_dimensions['C'].width = 15
+        ws.column_dimensions['D'].width = 25
+        ws.column_dimensions['E'].width = 40
+        ws.column_dimensions['F'].width = 20
+        
+        # Save to buffer
+        buffer = io.BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)
+        
+        logger.info(f"✅ Excel export generated: {len(contacts)} contacts")
+        
+        return StreamingResponse(
+            buffer,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f"attachment; filename=mita_contacts_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Excel export failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate Excel: {str(e)}"
+        )
+
+
 # Include the router in the main app
 app.include_router(api_router)
 
