@@ -18,6 +18,10 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 
+# Setup - Load environment variables BEFORE importing modules that use them
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
+
 from models import (
     Service, ServiceCreate, ServiceUpdate,
     SaasProduct, SaasProductCreate, SaasProductUpdate,
@@ -30,10 +34,6 @@ from auth import (
     get_current_user, init_admin_user
 )
 from email_service import send_contact_email, send_auto_response_email
-
-# Setup
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL')
