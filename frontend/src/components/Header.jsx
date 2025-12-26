@@ -16,18 +16,43 @@ const Header = () => {
   ];
 
   return (
-    <header style={{
-      background: 'var(--bg-primary)',
-      borderBottom: '1px solid var(--border-subtle)',
-      padding: '16px 7.6923%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      position: 'fixed',
-      top: 0,
-      width: '100%',
-      height: '80px',
-      zIndex: 10,
+    <>
+      {/* Skip to main content link for accessibility */}
+      <a 
+        href="#main-content" 
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          zIndex: 999,
+          padding: '1em',
+          backgroundColor: 'var(--brand-primary)',
+          color: 'var(--bg-primary)',
+          textDecoration: 'none',
+          fontWeight: 'bold'
+        }}
+        onFocus={(e) => {
+          e.target.style.left = '0';
+          e.target.style.top = '0';
+        }}
+        onBlur={(e) => {
+          e.target.style.left = '-9999px';
+        }}
+      >
+        Skip to main content
+      </a>
+      
+      <header style={{
+        background: 'var(--bg-primary)',
+        borderBottom: '1px solid var(--border-subtle)',
+        padding: '16px 7.6923%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'fixed',
+        top: 0,
+        width: '100%',
+        height: '80px',
+        zIndex: 10,
       boxSizing: 'border-box'
     }}>
       <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
