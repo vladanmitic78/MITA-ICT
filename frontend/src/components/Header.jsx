@@ -150,6 +150,7 @@ const Header = () => {
         }
       `}</style>
     </header>
+    </>
   );
 };
 
