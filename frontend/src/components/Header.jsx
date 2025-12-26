@@ -33,7 +33,7 @@ const Header = () => {
       <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
         <img 
           src="https://customer-assets.emergentagent.com/job_tech-advisory-4/artifacts/4cxdfavq_Icon.png" 
-          alt="MITA ICT" 
+          alt="MITA ICT Logo - IT and Telecommunications Consulting" 
           style={{ height: '40px', objectFit: 'contain', cursor: 'pointer' }}
         />
         <span style={{ marginLeft: '12px', fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)' }}>
