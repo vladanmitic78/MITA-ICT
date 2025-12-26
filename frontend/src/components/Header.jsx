@@ -117,23 +117,30 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <nav style={{
-          position: 'absolute',
-          top: '80px',
-          left: 0,
-          right: 0,
-          background: 'var(--bg-primary)',
-          borderBottom: '1px solid var(--border-subtle)',
-          padding: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px'
-        }} className="mobile-nav">
+        <nav 
+          id="mobile-navigation"
+          role="navigation"
+          aria-label="Mobile navigation"
+          style={{
+            position: 'absolute',
+            top: '80px',
+            left: 0,
+            right: 0,
+            background: 'var(--bg-primary)',
+            borderBottom: '1px solid var(--border-subtle)',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+          }} 
+          className="mobile-nav"
+        >
           {navLinks.map(link => (
             <Link
               key={link.path}
               to={link.path}
               onClick={() => setMobileMenuOpen(false)}
+              aria-current={isActive(link.path) ? 'page' : undefined}
               style={{
                 color: isActive(link.path) ? 'var(--brand-active)' : 'var(--text-muted)',
                 textDecoration: 'none',
