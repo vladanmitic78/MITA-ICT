@@ -70,6 +70,7 @@ const Footer = () => {
                   color: 'var(--text-muted)',
                   transition: 'color 0.3s'
                 }}
+                aria-label="Email MITA ICT at info@mitaict.com"
                 onMouseEnter={(e) => e.target.style.color = 'var(--brand-primary)'}
                 onMouseLeave={(e) => e.target.style.color = 'var(--text-muted)'}
               >
