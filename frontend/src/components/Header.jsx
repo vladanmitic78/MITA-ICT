@@ -67,11 +67,15 @@ const Header = () => {
       </Link>
 
       {/* Desktop Navigation */}
-      <nav style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '32px'
-      }} className="desktop-nav">
+      <nav 
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '32px'
+        }} 
+        className="desktop-nav"
+        aria-label="Main navigation"
+      >
         {navLinks.map(link => (
           <Link
             key={link.path}
@@ -83,6 +87,7 @@ const Header = () => {
               fontWeight: 400,
               transition: 'color 0.3s ease'
             }}
+            aria-current={isActive(link.path) ? 'page' : undefined}
             onMouseEnter={(e) => e.target.style.color = 'var(--text-primary)'}
             onMouseLeave={(e) => e.target.style.color = isActive(link.path) ? 'var(--brand-active)' : 'var(--text-muted)'}
           >
@@ -95,6 +100,9 @@ const Header = () => {
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         className="mobile-menu-btn"
+        aria-label={mobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
+        aria-expanded={mobileMenuOpen}
+        aria-controls="mobile-navigation"
         style={{
           display: 'none',
           background: 'transparent',
