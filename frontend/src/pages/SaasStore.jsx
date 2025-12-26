@@ -92,8 +92,9 @@ const SaasStore = () => {
                     rel="noopener noreferrer"
                     className="btn-primary"
                     style={{ textDecoration: 'none', width: '100%' }}
+                    aria-label={`Learn more about ${product.title}`}
                   >
-                    Learn More
+                    View Product Details
                     <ExternalLink size={20} />
                   </a>
                 </div>
