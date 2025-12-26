@@ -55,7 +55,7 @@ const Home = () => {
               <ArrowRight size={20} />
             </Link>
             <Link to="/about" className="btn-secondary" style={{ textDecoration: 'none' }}>
-              Learn More
+              Learn More About Our Consulting Services
             </Link>
           </div>
         </div>
