@@ -22,7 +22,7 @@ const Footer = () => {
         <div>
           <img 
             src="https://customer-assets.emergentagent.com/job_tech-advisory-4/artifacts/4cxdfavq_Icon.png" 
-            alt="MITA ICT" 
+            alt="MITA ICT Logo - Where Technology Meets Strategy" 
             style={{ height: '40px', marginBottom: '16px' }}
           />
           <p className="body-medium" style={{ marginBottom: '12px' }}>MITA ICT</p>
