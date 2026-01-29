@@ -374,7 +374,7 @@ const AdminDashboard = () => {
         padding: '0 7.6923%'
       }}>
         <div style={{ display: 'flex', gap: '32px' }}>
-          {['services', 'saas', 'about', 'contacts', 'chatleads'].map(tab => (
+          {['services', 'saas', 'about', 'contacts', 'chatleads', 'meetings'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -395,7 +395,8 @@ const AdminDashboard = () => {
               }}
             >
               {tab === 'chatleads' && <MessageCircle size={18} />}
-              {tab === 'chatleads' ? 'Chat Leads' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === 'meetings' && <Calendar size={18} />}
+              {tab === 'chatleads' ? 'Chat Leads' : tab === 'meetings' ? 'Meetings' : tab.charAt(0).toUpperCase() + tab.slice(1)}
               {tab === 'chatleads' && leadsOnlySessions.length > 0 && (
                 <span style={{
                   background: 'var(--brand-primary)',
@@ -406,6 +407,18 @@ const AdminDashboard = () => {
                   fontWeight: 600
                 }}>
                   {leadsOnlySessions.length}
+                </span>
+              )}
+              {tab === 'meetings' && pendingMeetings.length > 0 && (
+                <span style={{
+                  background: '#ffc107',
+                  color: 'black',
+                  fontSize: '12px',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontWeight: 600
+                }}>
+                  {pendingMeetings.length}
                 </span>
               )}
             </button>
