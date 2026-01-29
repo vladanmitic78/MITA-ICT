@@ -1,10 +1,11 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from './components/ui/sonner';
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense, useState } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
+import Chatbot from './components/Chatbot';
 import Home from './pages/Home';
 import SaasStore from './pages/SaasStore';
 import AboutUs from './pages/AboutUs';
