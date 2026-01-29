@@ -679,7 +679,7 @@ const AdminDashboard = () => {
                     border: '1px solid var(--border-subtle)'
                   }}>
                     <p className="body-medium" style={{ color: 'var(--text-primary)' }}>
-                      Found {filteredContacts.length} result{filteredContacts.length !== 1 ? 's' : ''} for "{searchQuery}"
+                      Found {filteredContacts.length} result{filteredContacts.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
                     </p>
                   </div>
                 )}
