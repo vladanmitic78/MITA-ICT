@@ -31,7 +31,26 @@ const LoadingFallback = () => (
 );
 
 function App() {
+  const [cookiesAccepted, setCookiesAccepted] = useState(false);
+
   useEffect(() => {
+    // Check if cookies were already accepted
+    const consent = localStorage.getItem('cookieConsent');
+    if (consent === 'accepted') {
+      setCookiesAccepted(true);
+    }
+
+    // Listen for consent changes
+    const handleStorageChange = () => {
+      const consent = localStorage.getItem('cookieConsent');
+      setCookiesAccepted(consent === 'accepted');
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically for same-tab changes
+    const interval = setInterval(handleStorageChange, 1000);
+
     // Global error handler for unhandled promise rejections
     const handleUnhandledRejection = (event) => {
       console.error('Unhandled promise rejection:', event.reason);
@@ -42,6 +61,8 @@ function App() {
 
     return () => {
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
     };
   }, []);
 
