@@ -173,3 +173,25 @@ class ChatResponse(BaseModel):
     session_id: str
     message: str
     lead_captured: bool = False
+
+
+# Meeting Request Models
+class MeetingRequest(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    session_id: str
+    name: str
+    email: str
+    phone: Optional[str] = None
+    preferred_datetime: str  # User's preferred meeting time
+    topic: Optional[str] = None
+    status: str = "pending"  # pending, approved, rejected
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    admin_notes: Optional[str] = None
+
+class MeetingRequestCreate(BaseModel):
+    session_id: str
+    name: str
+    email: str
+    phone: Optional[str] = None
+    preferred_datetime: str
+    topic: Optional[str] = None
