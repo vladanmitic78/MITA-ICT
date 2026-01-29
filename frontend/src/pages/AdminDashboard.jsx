@@ -22,6 +22,9 @@ const AdminDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [chatSessions, setChatSessions] = useState([]);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [sessionDetailOpen, setSessionDetailOpen] = useState(false);
 
   useEffect(() => {
     // Check if user is authenticated
