@@ -14,15 +14,18 @@ const CookieConsent = ({ onAccept }) => {
   useEffect(() => {
     // Check if user has already made a choice
     const consent = localStorage.getItem('cookieConsent');
-    if (!consent) {
+    if (!consent || consent !== 'accepted') {
       // Show banner after 1 second
       setTimeout(() => setShowBanner(true), 1000);
     } else {
       // Load saved preferences
       try {
-        const saved = JSON.parse(consent);
-        setPreferences(saved);
-        initializeServices(saved);
+        const saved = localStorage.getItem('cookiePreferences');
+        if (saved) {
+          const parsedPrefs = JSON.parse(saved);
+          setPreferences(parsedPrefs);
+          initializeServices(parsedPrefs);
+        }
         // Signal that cookies were already accepted
         if (onAccept) onAccept();
       } catch (e) {
