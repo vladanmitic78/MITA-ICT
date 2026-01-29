@@ -933,6 +933,183 @@ const AdminDashboard = () => {
                 )}
               </div>
             )}
+
+            {activeTab === 'meetings' && (
+              <div data-testid="admin-meetings-section">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                  <div>
+                    <h2 className="heading-1">Meeting Requests</h2>
+                    <p className="body-muted" style={{ marginTop: '8px' }}>
+                      Review and approve meeting requests from the chatbot. Respond to users via email.
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <span className="body-muted">
+                      {pendingMeetings.length} pending • {meetingRequests.length} total
+                    </span>
+                  </div>
+                </div>
+
+                {meetingRequests.length === 0 ? (
+                  <div style={{
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '60px',
+                    textAlign: 'center'
+                  }}>
+                    <Calendar size={48} color="var(--text-muted)" style={{ marginBottom: '16px' }} />
+                    <p className="body-large" style={{ color: 'var(--text-muted)' }}>
+                      No meeting requests yet. Users can schedule meetings through the chatbot.
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: '16px' }}>
+                    {meetingRequests.map((request) => (
+                      <div 
+                        key={request.id}
+                        data-testid={`meeting-request-${request.id}`}
+                        style={{
+                          background: request.status === 'pending' 
+                            ? 'linear-gradient(90deg, rgba(255,193,7,0.1) 0%, var(--bg-secondary) 100%)' 
+                            : request.status === 'approved'
+                            ? 'linear-gradient(90deg, rgba(40,167,69,0.1) 0%, var(--bg-secondary) 100%)'
+                            : 'var(--bg-secondary)',
+                          border: request.status === 'pending' 
+                            ? '1px solid #ffc107' 
+                            : request.status === 'approved'
+                            ? '1px solid #28a745'
+                            : '1px solid var(--border-subtle)',
+                          padding: '20px',
+                          borderRadius: '4px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                              <span style={{
+                                background: request.status === 'pending' ? '#ffc107' 
+                                  : request.status === 'approved' ? '#28a745' : '#dc3545',
+                                color: request.status === 'pending' ? 'black' : 'white',
+                                fontSize: '11px',
+                                padding: '4px 12px',
+                                borderRadius: '12px',
+                                fontWeight: 600,
+                                textTransform: 'uppercase',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}>
+                                {request.status === 'pending' && <Clock size={12} />}
+                                {request.status === 'approved' && <Check size={12} />}
+                                {request.status === 'rejected' && <X size={12} />}
+                                {request.status}
+                              </span>
+                            </div>
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '12px' }}>
+                              <div>
+                                <span className="body-muted" style={{ fontSize: '12px' }}>Name</span>
+                                <p className="body-medium">{request.name}</p>
+                              </div>
+                              <div>
+                                <span className="body-muted" style={{ fontSize: '12px' }}>Email</span>
+                                <p className="body-medium">
+                                  <a href={`mailto:${request.email}`} style={{ color: 'var(--brand-primary)' }}>
+                                    {request.email}
+                                  </a>
+                                </p>
+                              </div>
+                              <div>
+                                <span className="body-muted" style={{ fontSize: '12px' }}>Preferred Time</span>
+                                <p className="body-medium" style={{ color: 'var(--brand-primary)', fontWeight: 500 }}>
+                                  {request.preferred_datetime}
+                                </p>
+                              </div>
+                              <div>
+                                <span className="body-muted" style={{ fontSize: '12px' }}>Topic</span>
+                                <p className="body-medium">{request.topic || 'General consultation'}</p>
+                              </div>
+                            </div>
+                            
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                              Requested: {new Date(request.created_at).toLocaleString()}
+                            </div>
+                          </div>
+                          
+                          <div style={{ display: 'flex', gap: '8px', marginLeft: '20px', flexDirection: 'column' }}>
+                            {request.status === 'pending' && (
+                              <>
+                                <Button
+                                  onClick={() => handleUpdateMeetingStatus(request.id, 'approved')}
+                                  style={{ 
+                                    background: '#28a745', 
+                                    color: 'white',
+                                    padding: '8px 16px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                  }}
+                                >
+                                  <Check size={16} />
+                                  Approve
+                                </Button>
+                                <Button
+                                  onClick={() => handleUpdateMeetingStatus(request.id, 'rejected')}
+                                  style={{ 
+                                    background: '#dc3545', 
+                                    color: 'white',
+                                    padding: '8px 16px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                  }}
+                                >
+                                  <X size={16} />
+                                  Reject
+                                </Button>
+                              </>
+                            )}
+                            <a
+                              href={`mailto:${request.email}?subject=MITA ICT Meeting - ${request.preferred_datetime}&body=Hello ${request.name},%0D%0A%0D%0AThank you for scheduling a meeting with MITA ICT.%0D%0A%0D%0AYour requested time: ${request.preferred_datetime}%0D%0ATopic: ${request.topic || 'General consultation'}%0D%0A%0D%0A`}
+                              style={{ textDecoration: 'none' }}
+                            >
+                              <Button
+                                className="btn-secondary"
+                                style={{ 
+                                  padding: '8px 16px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  width: '100%'
+                                }}
+                              >
+                                <Mail size={16} />
+                                Email
+                              </Button>
+                            </a>
+                            <button
+                              onClick={() => handleDeleteMeeting(request.id)}
+                              style={{
+                                background: 'rgba(255, 0, 0, 0.1)',
+                                border: 'none',
+                                padding: '8px',
+                                cursor: 'pointer',
+                                borderRadius: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <Trash2 size={16} color="#ff4444" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>
