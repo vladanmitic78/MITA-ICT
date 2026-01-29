@@ -27,7 +27,8 @@ from models import (
     SaasProduct, SaasProductCreate, SaasProductUpdate,
     Contact, ContactCreate, ContactUpdate,
     AboutContent, AboutContentUpdate,
-    AdminLogin, Token, Admin, ChangePassword
+    AdminLogin, Token, Admin, ChangePassword,
+    SocialIntegrations
 )
 from auth import (
     verify_password, get_password_hash, create_access_token, 
