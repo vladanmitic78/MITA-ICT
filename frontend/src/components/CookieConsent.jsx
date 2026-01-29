@@ -91,20 +91,19 @@ const CookieConsent = () => {
           style={{
             position: 'fixed',
             bottom: '20px',
-            left: '20px',
             right: '20px',
-            maxWidth: '500px',
+            maxWidth: '380px',
             background: 'var(--bg-secondary)',
             border: '1px solid var(--border-subtle)',
-            padding: '24px',
+            padding: '20px',
             zIndex: 9999,
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <Cookie size={24} color="var(--brand-primary)" />
-              <h3 className="heading-2" style={{ margin: 0 }}>Vi använder cookies</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Cookie size={20} color="var(--brand-primary)" />
+              <h3 className="body-large" style={{ margin: 0, fontWeight: 600 }}>Cookie Preferences</h3>
             </div>
             <button
               onClick={handleAcceptNecessary}
@@ -116,43 +115,37 @@ const CookieConsent = () => {
               }}
               aria-label="Close and accept necessary cookies only"
             >
-              <X size={20} color="var(--text-muted)" />
+              <X size={18} color="var(--text-muted)" />
             </button>
           </div>
 
-          <p className="body-medium" style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>
-            Vi använder cookies för att förbättra din upplevelse på vår webbplats och för marknadsföringsändamål 
-            på sociala medier. Genom att klicka "Acceptera alla" samtycker du till användning av alla cookies 
-            enligt svensk lag (GDPR).
+          <p className="body-small" style={{ marginBottom: '14px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+            We use cookies to improve your experience and for marketing on social media. 
+            By clicking "Accept All" you consent per GDPR/Swedish law.
           </p>
 
-          <p className="body-small" style={{ marginBottom: '20px', color: 'var(--text-muted)' }}>
-            <strong>English:</strong> We use cookies to improve your experience and for marketing on social media. 
-            By clicking "Accept All" you consent to all cookies per Swedish law (GDPR).
-          </p>
-
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <Button
               onClick={handleAcceptAll}
               className="btn-primary"
-              style={{ flex: 1, minWidth: '140px' }}
+              style={{ flex: 1, minWidth: '100px', padding: '10px 16px', fontSize: '14px' }}
             >
-              Acceptera alla
+              Accept All
             </Button>
             <Button
               onClick={handleAcceptNecessary}
               className="btn-secondary"
-              style={{ flex: 1, minWidth: '140px' }}
+              style={{ flex: 1, minWidth: '100px', padding: '10px 16px', fontSize: '14px' }}
             >
-              Endast nödvändiga
+              Necessary Only
             </Button>
             <Button
               onClick={() => setShowSettings(true)}
               className="btn-secondary"
-              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 12px', fontSize: '14px' }}
             >
-              <Settings size={16} />
-              Inställningar
+              <Settings size={14} />
+              Settings
             </Button>
           </div>
         </div>
