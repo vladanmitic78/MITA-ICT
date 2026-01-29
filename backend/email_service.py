@@ -151,3 +151,74 @@ async def send_auto_response_email(name: str, email: str, phone: str, service: s
     except Exception as e:
         logger.error(f"Failed to send auto-response email: {str(e)}")
         raise Exception(f"Auto-response email sending failed: {str(e)}")
+
+
+async def send_meeting_request_email(name: str, email: str, phone: str, preferred_datetime: str, topic: str):
+    """Send meeting request email to admin for approval"""
+    try:
+        message = MIMEMultipart('alternative')
+        message['From'] = SMTP_FROM_EMAIL
+        message['To'] = SMTP_TO_EMAIL
+        message['Subject'] = f'🗓️ Meeting Request from {name} - Approval Required'
+
+        html_body = f"""
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border: 1px solid #ddd;">
+              <h2 style="color: #00FFD1; border-bottom: 2px solid #00FFD1; padding-bottom: 10px;">
+                🗓️ New Meeting Request - Approval Required
+              </h2>
+              
+              <div style="background-color: #fff3cd; padding: 15px; margin: 15px 0; border-radius: 5px; border-left: 4px solid #ffc107;">
+                <p style="margin: 0; font-weight: bold; color: #856404;">
+                  ⏳ This meeting request is awaiting your approval
+                </p>
+              </div>
+              
+              <div style="background-color: white; padding: 20px; margin-top: 20px; border-radius: 5px;">
+                <h3 style="color: #333; margin-top: 0;">Contact Details</h3>
+                <p><strong>Name:</strong> {name}</p>
+                <p><strong>Email:</strong> <a href="mailto:{email}">{email}</a></p>
+                <p><strong>Phone:</strong> {phone if phone else 'Not provided'}</p>
+                
+                <h3 style="color: #333; margin-top: 25px;">Meeting Details</h3>
+                <div style="background-color: #e8f8f5; padding: 15px; border-radius: 5px; border-left: 4px solid #00FFD1;">
+                  <p style="margin: 5px 0;"><strong>📅 Preferred Time:</strong> {preferred_datetime}</p>
+                  <p style="margin: 5px 0;"><strong>📋 Topic:</strong> {topic if topic else 'General consultation'}</p>
+                </div>
+              </div>
+              
+              <div style="margin-top: 20px; padding: 15px; background-color: #d4edda; border-radius: 5px; text-align: center;">
+                <p style="margin: 0; font-size: 14px; color: #155724;">
+                  <strong>To approve this meeting:</strong><br>
+                  Reply to <a href="mailto:{email}">{email}</a> with your confirmation and meeting link.
+                </p>
+              </div>
+              
+              <div style="margin-top: 15px; padding: 10px; font-size: 12px; color: #666; text-align: center;">
+                This request was submitted via the MITA ICT AI Chatbot.
+              </div>
+            </div>
+          </body>
+        </html>
+        """
+
+        html_part = MIMEText(html_body, 'html')
+        message.attach(html_part)
+
+        await aiosmtplib.send(
+            message,
+            hostname=SMTP_HOST,
+            port=SMTP_PORT,
+            username=SMTP_USERNAME,
+            password=SMTP_PASSWORD,
+            use_tls=True,
+            start_tls=False
+        )
+        
+        logger.info(f"Meeting request email sent for {name}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to send meeting request email: {str(e)}")
+        raise Exception(f"Meeting request email failed: {str(e)}")
