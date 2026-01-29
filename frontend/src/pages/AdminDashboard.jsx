@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Edit2, Trash2, Mail, Save, Settings, Search, Download, FileText, FileSpreadsheet, Share2, MessageCircle, Eye } from 'lucide-react';
+import { LogOut, Plus, Edit2, Trash2, Mail, Save, Settings, Search, Download, FileText, FileSpreadsheet, Share2, MessageCircle, Eye, Calendar, Check, X, Clock } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
@@ -25,6 +25,7 @@ const AdminDashboard = () => {
   const [chatSessions, setChatSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [sessionDetailOpen, setSessionDetailOpen] = useState(false);
+  const [meetingRequests, setMeetingRequests] = useState([]);
 
   useEffect(() => {
     // Check if user is authenticated
