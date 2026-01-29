@@ -95,10 +95,8 @@ Build a full-stack consulting website for "MITA ICT" with a dark-themed, convers
 - `social_integrations` - Social media API keys
 
 ## Upcoming/Future Tasks (Backlog)
-1. **P1**: Meeting scheduling functionality in chatbot (collect preferred time, send email)
-2. **P2**: Refactor server.py into smaller routers for better maintainability
-3. **P2**: Database pagination for large datasets
-4. **P3**: Add database indexes and query projections for performance
+1. **P2**: Database pagination for large datasets
+2. **P3**: Add database indexes and query projections for performance
 
 ## Notes
 - Chatbot uses Emergent Universal Key (no user-provided API key needed)
