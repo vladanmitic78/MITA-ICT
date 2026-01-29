@@ -78,7 +78,13 @@ async def startup_db_client():
     """Initialize database with default data"""
     logger.info("🚀 Starting MITA ICT Backend...")
     
-    # Initialize admin user
+    # Migrate old admin to new credentials
+    old_admin = await db.admins.find_one({"username": "admin"})
+    if old_admin:
+        await db.admins.delete_one({"username": "admin"})
+        logger.info("✅ Old admin user removed")
+    
+    # Initialize admin user with new credentials
     await init_admin_user(db)
     
     # Initialize default services if none exist
