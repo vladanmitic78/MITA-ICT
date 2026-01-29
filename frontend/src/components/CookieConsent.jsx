@@ -48,10 +48,9 @@ const CookieConsent = ({ onAccept }) => {
   };
 
   const savePreferences = (prefs) => {
-    localStorage.setItem('cookieConsent', JSON.stringify(prefs));
-    localStorage.setItem('cookieConsentDate', new Date().toISOString());
-    // Also store a simple 'accepted' flag for easier checking
+    localStorage.setItem('cookiePreferences', JSON.stringify(prefs));
     localStorage.setItem('cookieConsent', 'accepted');
+    localStorage.setItem('cookieConsentDate', new Date().toISOString());
     initializeServices(prefs);
     // Notify parent component
     if (onAccept) onAccept();
