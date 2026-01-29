@@ -1096,6 +1096,122 @@ const AdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Chat Session Detail Dialog */}
+      <Dialog open={sessionDetailOpen} onOpenChange={setSessionDetailOpen}>
+        <DialogContent style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-subtle)',
+          maxWidth: '700px',
+          maxHeight: '80vh',
+          padding: '32px',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <DialogHeader>
+            <DialogTitle className="heading-1" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <MessageCircle size={24} color="var(--brand-primary)" />
+              Conversation Details
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedSession && (
+            <div style={{ marginTop: '24px', flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              {/* Lead Info Summary */}
+              {selectedSession.lead_captured && (
+                <div style={{
+                  background: 'rgba(0,217,255,0.1)',
+                  border: '1px solid var(--brand-primary)',
+                  padding: '16px',
+                  marginBottom: '20px',
+                  borderRadius: '4px'
+                }}>
+                  <h4 className="body-medium" style={{ marginBottom: '12px', color: 'var(--brand-primary)' }}>
+                    Captured Lead Information
+                  </h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                    <div>
+                      <span className="body-muted" style={{ fontSize: '12px' }}>Name</span>
+                      <p className="body-medium">{selectedSession.lead_name || 'Not provided'}</p>
+                    </div>
+                    <div>
+                      <span className="body-muted" style={{ fontSize: '12px' }}>Email</span>
+                      <p className="body-medium" style={{ color: 'var(--brand-primary)' }}>
+                        {selectedSession.lead_email || 'Not provided'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="body-muted" style={{ fontSize: '12px' }}>Phone</span>
+                      <p className="body-medium">{selectedSession.lead_phone || 'Not provided'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Conversation Messages */}
+              <div style={{ marginBottom: '12px' }}>
+                <span className="body-muted" style={{ fontSize: '14px' }}>
+                  Conversation ({selectedSession.messages?.length || 0} messages)
+                </span>
+              </div>
+              
+              <div style={{
+                flex: 1,
+                overflowY: 'auto',
+                background: 'var(--bg-primary)',
+                border: '1px solid var(--border-subtle)',
+                padding: '16px',
+                borderRadius: '4px'
+              }}>
+                {selectedSession.messages?.map((msg, idx) => (
+                  <div 
+                    key={idx}
+                    style={{
+                      marginBottom: '16px',
+                      display: 'flex',
+                      justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'
+                    }}
+                  >
+                    <div style={{
+                      maxWidth: '85%',
+                      padding: '12px 16px',
+                      borderRadius: msg.role === 'user' ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
+                      background: msg.role === 'user' 
+                        ? 'linear-gradient(135deg, var(--brand-primary) 0%, #0066cc 100%)' 
+                        : 'var(--bg-secondary)',
+                      color: msg.role === 'user' ? 'black' : 'var(--text-primary)',
+                      border: msg.role === 'user' ? 'none' : '1px solid var(--border-subtle)'
+                    }}>
+                      <div style={{ 
+                        fontSize: '11px', 
+                        marginBottom: '6px',
+                        opacity: 0.7,
+                        fontWeight: 500
+                      }}>
+                        {msg.role === 'user' ? 'Visitor' : 'AI Assistant'}
+                      </div>
+                      <p style={{ fontSize: '14px', lineHeight: '1.5', margin: 0, whiteSpace: 'pre-wrap' }}>
+                        {msg.content}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Session Info Footer */}
+              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span className="body-muted" style={{ fontSize: '12px' }}>
+                  Session ID: {selectedSession.id?.substring(0, 8)}...
+                </span>
+                <span className="body-muted" style={{ fontSize: '12px' }}>
+                  Started: {new Date(selectedSession.created_at).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
