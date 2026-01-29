@@ -31,7 +31,7 @@ const Home = () => {
 
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>
-      {/* Hero Section */}
+      {/* Hero Section - SEO Optimized */}
       <section style={{
         padding: '100px 7.6923%',
         minHeight: '600px',
@@ -43,20 +43,55 @@ const Home = () => {
       }}>
         <div style={{ maxWidth: '900px' }}>
           <h1 className="display-huge" style={{ marginBottom: '24px' }}>
-            Where Technology Meets Strategy
+            IT Consulting & Managed IT Services in Stockholm
           </h1>
           <p className="body-large" style={{ marginBottom: '40px', color: 'var(--text-secondary)' }}>
-            Expert IT & Telecom consulting services with over 20 years of industry experience. 
-            We help businesses transform through technology and strategic leadership.
+            MITA ICT is a leading technology solutions provider with 20+ years of experience. 
+            We deliver expert IT strategy consulting, cloud solutions, cybersecurity, and digital transformation services 
+            for enterprises and SMEs across Sweden and Europe.
           </p>
           <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/contact" className="btn-primary" style={{ textDecoration: 'none' }}>
-              Get Started
+            <Link to="/contact" className="btn-primary" style={{ textDecoration: 'none' }} data-testid="hero-cta-btn">
+              Get Free Consultation
               <ArrowRight size={20} />
             </Link>
             <Link to="/about" className="btn-secondary" style={{ textDecoration: 'none' }}>
-              Learn More About Our Consulting Services
+              Learn More About Us
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Value Proposition Section */}
+      <section style={{
+        padding: '60px 7.6923%',
+        background: 'var(--bg-secondary)',
+        borderTop: '1px solid var(--border-subtle)',
+        borderBottom: '1px solid var(--border-subtle)'
+      }}>
+        <div style={{ 
+          maxWidth: '1400px', 
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '40px',
+          textAlign: 'center'
+        }}>
+          <div>
+            <h3 className="heading-2" style={{ color: 'var(--brand-primary)', marginBottom: '8px' }}>20+</h3>
+            <p className="body-medium">Years of IT Consulting Experience</p>
+          </div>
+          <div>
+            <h3 className="heading-2" style={{ color: 'var(--brand-primary)', marginBottom: '8px' }}>100+</h3>
+            <p className="body-medium">Enterprise IT Solutions Delivered</p>
+          </div>
+          <div>
+            <h3 className="heading-2" style={{ color: 'var(--brand-primary)', marginBottom: '8px' }}>24/7</h3>
+            <p className="body-medium">Managed IT Support Available</p>
+          </div>
+          <div>
+            <h3 className="heading-2" style={{ color: 'var(--brand-primary)', marginBottom: '8px' }}>Sweden</h3>
+            <p className="body-medium">Based in Stockholm</p>
           </div>
         </div>
       </section>
@@ -67,9 +102,13 @@ const Home = () => {
         background: 'var(--bg-primary)'
       }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <h2 className="display-large" style={{ textAlign: 'center', marginBottom: '60px' }}>
-            Our Consulting Services
+          <h2 className="display-large" style={{ textAlign: 'center', marginBottom: '20px' }}>
+            Our IT Consulting Services
           </h2>
+          <p className="body-large" style={{ textAlign: 'center', marginBottom: '60px', color: 'var(--text-secondary)', maxWidth: '700px', margin: '0 auto 60px' }}>
+            Comprehensive business IT services including cloud transformation consulting, 
+            cybersecurity solutions, IT infrastructure management, and digital strategy consulting.
+          </p>
           
           <div style={{
             display: 'grid',
