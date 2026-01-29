@@ -283,6 +283,28 @@ const AdminDashboard = () => {
     );
   });
 
+  // View chat session details
+  const handleViewSession = async (sessionId) => {
+    try {
+      const response = await adminAPI.getChatSession(sessionId);
+      setSelectedSession(response.data);
+      setSessionDetailOpen(true);
+    } catch (error) {
+      console.error('Error fetching session:', error);
+      toast.error('Failed to load conversation');
+    }
+  };
+
+  // Delete chat session
+  const handleDeleteSession = async (sessionId) => {
+    setItemToDelete({ id: sessionId, type: 'chatSession' });
+    setDeleteConfirmOpen(true);
+  };
+
+  // Filter chat sessions with leads
+  const leadsOnlySessions = chatSessions.filter(s => s.lead_captured);
+  const allSessions = chatSessions;
+
 
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>
