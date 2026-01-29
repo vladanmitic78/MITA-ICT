@@ -86,6 +86,50 @@ class AdminCreate(BaseModel):
     email: EmailStr
     password: str
 
+
+
+# Social Media Integration Models
+class FacebookIntegration(BaseModel):
+    enabled: bool = False
+    pixelId: str = ""
+    accessToken: str = ""
+    pageId: str = ""
+    appId: str = ""
+    appSecret: str = ""
+
+class InstagramIntegration(BaseModel):
+    enabled: bool = False
+    accessToken: str = ""
+    businessAccountId: str = ""
+
+class TikTokIntegration(BaseModel):
+    enabled: bool = False
+    pixelId: str = ""
+    accessToken: str = ""
+    advertiserId: str = ""
+
+class LinkedInIntegration(BaseModel):
+    enabled: bool = False
+    partnerId: str = ""
+    accessToken: str = ""
+    organizationId: str = ""
+
+class YouTubeIntegration(BaseModel):
+    enabled: bool = False
+    apiKey: str = ""
+    channelId: str = ""
+    clientId: str = ""
+    clientSecret: str = ""
+
+class SocialIntegrations(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    facebook: FacebookIntegration = Field(default_factory=FacebookIntegration)
+    instagram: InstagramIntegration = Field(default_factory=InstagramIntegration)
+    tiktok: TikTokIntegration = Field(default_factory=TikTokIntegration)
+    linkedin: LinkedInIntegration = Field(default_factory=LinkedInIntegration)
+    youtube: YouTubeIntegration = Field(default_factory=YouTubeIntegration)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
 class ChangePassword(BaseModel):
     current_password: str
     new_password: str
