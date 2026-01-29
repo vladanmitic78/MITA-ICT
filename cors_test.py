@@ -6,7 +6,7 @@ Specific CORS and Browser Compatibility Test
 import requests
 import json
 
-BASE_URL = "https://tech-strategy-hub.preview.emergentagent.com"
+BASE_URL = "https://mita-sales-bot.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def test_cors_detailed():
@@ -76,8 +76,8 @@ def test_browser_simulation():
         "Accept": "application/json, text/plain, */*",
         "Accept-Language": "en-US,en;q=0.9",
         "Accept-Encoding": "gzip, deflate, br",
-        "Origin": "https://tech-strategy-hub.preview.emergentagent.com",
-        "Referer": "https://tech-strategy-hub.preview.emergentagent.com/admin/login"
+        "Origin": "https://mita-sales-bot.preview.emergentagent.com",
+        "Referer": "https://mita-sales-bot.preview.emergentagent.com/admin/login"
     }
     
     try:

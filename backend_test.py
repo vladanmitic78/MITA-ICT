@@ -11,7 +11,7 @@ from datetime import datetime
 import sys
 
 # Configuration
-BASE_URL = "https://tech-strategy-hub.preview.emergentagent.com"
+BASE_URL = "https://mita-sales-bot.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 # Test credentials
