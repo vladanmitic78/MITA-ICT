@@ -776,8 +776,7 @@ async def update_social_integrations(
 
 # ==================== CHATBOT ENDPOINTS ====================
 
-# Initialize Claude client
-from emergentintegrations.llm.claude import ClaudeConversation
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 # System prompt for the chatbot
 CHATBOT_SYSTEM_PROMPT = """You are a friendly and professional sales assistant for MITA ICT, a consulting company with 20+ years of experience in IT and telecommunications. Your goal is to help visitors understand our services and gently guide them toward scheduling a meeting or providing their contact information.
@@ -830,21 +829,23 @@ async def chat_message(request: ChatRequest):
             session = ChatSession()
             session_id = session.id
         
-        # Create conversation with history
-        conversation = ClaudeConversation(
+        # Create chat instance with Claude model
+        chat = LlmChat(
             api_key=emergent_key,
-            system_prompt=CHATBOT_SYSTEM_PROMPT
-        )
+            session_id=session_id,
+            system_message=CHATBOT_SYSTEM_PROMPT
+        ).with_model("anthropic", "claude-sonnet-4-20250514")
         
-        # Add previous messages to conversation
+        # Add previous messages to conversation for context
         for msg in session.messages:
             if msg.role == "user":
-                conversation.add_user_message(msg.content)
+                chat.add_user_message(msg.content)
             elif msg.role == "assistant":
-                conversation.add_assistant_message(msg.content)
+                chat.add_assistant_message(msg.content)
         
-        # Get AI response
-        ai_response = conversation.send_message(request.message)
+        # Create user message and get AI response
+        user_msg = UserMessage(text=request.message)
+        ai_response = await chat.send_message(user_msg)
         
         # Add messages to session
         user_message = ChatMessage(role="user", content=request.message)
