@@ -102,7 +102,17 @@ export const adminAPI = {
   
   // Social Media Integrations
   getSocialIntegrations: () => apiClient.get('/admin/social-integrations'),
-  updateSocialIntegrations: (data) => apiClient.put('/admin/social-integrations', data)
+  updateSocialIntegrations: (data) => apiClient.put('/admin/social-integrations', data),
+  
+  // Chat Sessions (Admin)
+  getChatSessions: () => apiClient.get('/admin/chat-sessions'),
+  getChatSession: (id) => apiClient.get(`/admin/chat-sessions/${id}`),
+  deleteChatSession: (id) => apiClient.delete(`/admin/chat-sessions/${id}`)
+};
+
+// Chatbot API (Public)
+export const chatAPI = {
+  sendMessage: (data) => apiClient.post('/chat/message', data)
 };
 
 export default apiClient;
