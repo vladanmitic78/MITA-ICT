@@ -196,6 +196,10 @@ const AdminDashboard = () => {
         await adminAPI.deleteContact(id);
         setContacts(contacts.filter(c => c.id !== id));
         toast.success('Contact deleted successfully!');
+      } else if (type === 'chatSession') {
+        await adminAPI.deleteChatSession(id);
+        setChatSessions(chatSessions.filter(s => s.id !== id));
+        toast.success('Chat session deleted successfully!');
       }
       
       setDeleteConfirmOpen(false);
