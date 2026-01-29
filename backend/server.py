@@ -774,6 +774,189 @@ async def update_social_integrations(
     logger.info("✅ Social media integrations updated")
     return SocialIntegrations(**integration_dict)
 
+# ==================== CHATBOT ENDPOINTS ====================
+
+# Initialize Claude client
+from emergentintegrations.llm.claude import ClaudeConversation
+
+# System prompt for the chatbot
+CHATBOT_SYSTEM_PROMPT = """You are a friendly and professional sales assistant for MITA ICT, a consulting company with 20+ years of experience in IT and telecommunications. Your goal is to help visitors understand our services and gently guide them toward scheduling a meeting or providing their contact information.
+
+Our Services:
+1. IT and Telecommunication Consulting - Comprehensive IT and telecom consulting services including infrastructure, network optimization, and advanced solutions.
+2. Company Registration in Sweden - Complete support for company registration and business setup in Sweden.
+3. Leading Teams - Expert leadership consulting for sales and engineering teams.
+
+Our SaaS Products:
+1. MITACRM - Powerful CRM solution for modern businesses
+2. Routing System - Advanced routing for telecommunications
+3. White Label Software - Customizable solutions
+
+Guidelines:
+- Be warm, helpful, and conversational
+- Answer questions about our services briefly but informatively
+- After 2-3 exchanges, naturally try to capture contact information (name, email, phone)
+- Suggest scheduling a free consultation call when appropriate
+- If they share contact info, acknowledge it warmly and assure them someone will reach out soon
+- Keep responses concise (2-3 sentences max unless they ask for details)
+- If asked about pricing, mention that it varies by project and suggest a call to discuss their specific needs
+
+When capturing lead information, be natural:
+- "I'd love to have one of our experts follow up with you. Could I get your name and email?"
+- "That sounds like a great project! To set up a quick call, I just need your contact details."
+"""
+
+@api_router.post("/chat/message", response_model=ChatResponse)
+async def chat_message(request: ChatRequest):
+    """Handle chatbot messages"""
+    try:
+        emergent_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not emergent_key:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Chatbot is not configured"
+            )
+        
+        # Get or create session
+        session_id = request.session_id
+        session = None
+        
+        if session_id:
+            session_doc = await db.chat_sessions.find_one({"id": session_id})
+            if session_doc:
+                session = ChatSession(**session_doc)
+        
+        if not session:
+            session = ChatSession()
+            session_id = session.id
+        
+        # Create conversation with history
+        conversation = ClaudeConversation(
+            api_key=emergent_key,
+            system_prompt=CHATBOT_SYSTEM_PROMPT
+        )
+        
+        # Add previous messages to conversation
+        for msg in session.messages:
+            if msg.role == "user":
+                conversation.add_user_message(msg.content)
+            elif msg.role == "assistant":
+                conversation.add_assistant_message(msg.content)
+        
+        # Get AI response
+        ai_response = conversation.send_message(request.message)
+        
+        # Add messages to session
+        user_message = ChatMessage(role="user", content=request.message)
+        assistant_message = ChatMessage(role="assistant", content=ai_response)
+        session.messages.append(user_message)
+        session.messages.append(assistant_message)
+        session.updated_at = datetime.utcnow()
+        
+        # Check for lead capture patterns in user message
+        user_text_lower = request.message.lower()
+        
+        # Simple lead extraction (can be enhanced later)
+        import re
+        email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+        phone_pattern = r'[\+]?[(]?[0-9]{1,3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}'
+        
+        emails = re.findall(email_pattern, request.message)
+        phones = re.findall(phone_pattern, request.message)
+        
+        if emails:
+            session.lead_email = emails[0]
+            session.lead_captured = True
+        if phones:
+            session.lead_phone = phones[0]
+            session.lead_captured = True
+        
+        # Check if name-like pattern (simple heuristic)
+        if any(phrase in user_text_lower for phrase in ['my name is', "i'm ", "i am ", "call me "]):
+            # Extract potential name
+            for phrase in ['my name is ', "i'm ", "i am ", "call me "]:
+                if phrase in user_text_lower:
+                    idx = user_text_lower.find(phrase) + len(phrase)
+                    potential_name = request.message[idx:].split()[0:2]
+                    if potential_name:
+                        session.lead_name = ' '.join(potential_name).strip('.,!?')
+                        break
+        
+        # Save session to database
+        session_dict = session.dict()
+        session_dict['messages'] = [m.dict() for m in session.messages]
+        
+        await db.chat_sessions.update_one(
+            {"id": session_id},
+            {"$set": session_dict},
+            upsert=True
+        )
+        
+        logger.info(f"✅ Chat message processed for session: {session_id}")
+        
+        return ChatResponse(
+            session_id=session_id,
+            message=ai_response,
+            lead_captured=session.lead_captured
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Chat error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Chat service error: {str(e)}"
+        )
+
+@api_router.get("/admin/chat-sessions")
+async def get_chat_sessions(current_user: dict = Depends(get_current_user)):
+    """Get all chat sessions with leads (admin only)"""
+    sessions = await db.chat_sessions.find().sort("updated_at", -1).to_list(1000)
+    
+    # Convert to safe format (exclude _id)
+    result = []
+    for session in sessions:
+        session_data = {
+            "id": session.get("id"),
+            "lead_captured": session.get("lead_captured", False),
+            "lead_name": session.get("lead_name"),
+            "lead_email": session.get("lead_email"),
+            "lead_phone": session.get("lead_phone"),
+            "lead_interest": session.get("lead_interest"),
+            "message_count": len(session.get("messages", [])),
+            "created_at": session.get("created_at"),
+            "updated_at": session.get("updated_at")
+        }
+        result.append(session_data)
+    
+    return result
+
+@api_router.get("/admin/chat-sessions/{session_id}")
+async def get_chat_session(
+    session_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get a specific chat session with full conversation (admin only)"""
+    session = await db.chat_sessions.find_one({"id": session_id})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    # Remove MongoDB _id field
+    session_data = {k: v for k, v in session.items() if k != '_id'}
+    return session_data
+
+@api_router.delete("/admin/chat-sessions/{session_id}")
+async def delete_chat_session(
+    session_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a chat session (admin only)"""
+    result = await db.chat_sessions.delete_one({"id": session_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    logger.info(f"✅ Chat session deleted: {session_id}")
+    return {"message": "Chat session deleted successfully"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
