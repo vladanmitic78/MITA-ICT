@@ -166,15 +166,68 @@ const Home = () => {
       }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <h2 className="display-large" style={{ marginBottom: '24px' }}>
-            Ready to Transform Your Business?
+            Ready for Digital Transformation?
           </h2>
           <p className="body-large" style={{ marginBottom: '40px', color: 'var(--text-secondary)' }}>
-            Let's discuss how our expertise can help you achieve your technology and business goals.
+            Whether you need managed IT services, cloud migration, cybersecurity consulting, or 
+            IT strategy planning - our expert team in Stockholm is ready to help your business grow.
           </p>
           <Link to="/contact" className="btn-primary" style={{ textDecoration: 'none' }}>
-            Contact Us Today
+            Schedule Free IT Consultation
             <ArrowRight size={20} />
           </Link>
+        </div>
+      </section>
+
+      {/* SEO Content Section */}
+      <section style={{
+        padding: '80px 7.6923%',
+        background: 'var(--bg-primary)',
+        borderTop: '1px solid var(--border-subtle)'
+      }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <h2 className="heading-1" style={{ marginBottom: '24px', textAlign: 'center' }}>
+            Why Choose MITA ICT for IT Consulting in Sweden?
+          </h2>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+            gap: '30px',
+            marginTop: '40px'
+          }}>
+            <div style={{ padding: '20px' }}>
+              <h3 className="body-large" style={{ color: 'var(--brand-primary)', marginBottom: '12px' }}>
+                Best IT Consulting Services for Small Business
+              </h3>
+              <p className="body-medium" style={{ color: 'var(--text-muted)' }}>
+                Tailored IT solutions that scale with your business needs and budget.
+              </p>
+            </div>
+            <div style={{ padding: '20px' }}>
+              <h3 className="body-large" style={{ color: 'var(--brand-primary)', marginBottom: '12px' }}>
+                Managed IT Support for Enterprises
+              </h3>
+              <p className="body-medium" style={{ color: 'var(--text-muted)' }}>
+                24/7 enterprise IT support with proactive monitoring and rapid response.
+              </p>
+            </div>
+            <div style={{ padding: '20px' }}>
+              <h3 className="body-large" style={{ color: 'var(--brand-primary)', marginBottom: '12px' }}>
+                Affordable Cloud Migration Services
+              </h3>
+              <p className="body-medium" style={{ color: 'var(--text-muted)' }}>
+                Seamless cloud transformation with minimal disruption to your operations.
+              </p>
+            </div>
+            <div style={{ padding: '20px' }}>
+              <h3 className="body-large" style={{ color: 'var(--brand-primary)', marginBottom: '12px' }}>
+                Cybersecurity Consulting for SMEs
+              </h3>
+              <p className="body-medium" style={{ color: 'var(--text-muted)' }}>
+                Protect your business with enterprise-grade security solutions.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </div>
