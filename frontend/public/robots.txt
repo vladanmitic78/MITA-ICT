@@ -1,4 +1,40 @@
-User-agent: *
-Disallow: /admin/
+# MITA ICT - robots.txt
+# https://www.mitaict.com
 
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /api/
+Disallow: /*.json$
+
+# Allow search engines to crawl main pages
+Allow: /saas
+Allow: /about
+Allow: /contact
+
+# Sitemap location
 Sitemap: https://www.mitaict.com/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+
+# Bing-specific
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+
+# Social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
