@@ -101,7 +101,7 @@ const Chatbot = () => {
             color: 'var(--text-primary)',
             lineHeight: '1.4'
           }}>
-            Need help? <span style={{ color: 'var(--accent-cyan)' }}>Chat with us!</span>
+            Need help? <span style={{ color: 'var(--brand-primary)' }}>Chat with us!</span>
           </p>
         </div>
       )}
