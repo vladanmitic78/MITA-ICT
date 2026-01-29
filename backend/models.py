@@ -146,3 +146,30 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+
+# Chatbot Models
+class ChatMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+class ChatSession(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    messages: List[ChatMessage] = []
+    lead_captured: bool = False
+    lead_name: Optional[str] = None
+    lead_email: Optional[str] = None
+    lead_phone: Optional[str] = None
+    lead_interest: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ChatRequest(BaseModel):
+    session_id: Optional[str] = None
+    message: str
+
+class ChatResponse(BaseModel):
+    session_id: str
+    message: str
+    lead_captured: bool = False
