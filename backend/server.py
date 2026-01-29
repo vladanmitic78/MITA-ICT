@@ -901,6 +901,54 @@ async def chat_message(request: ChatRequest):
                         session.lead_name = ' '.join(potential_name).strip('.,!?')
                         break
         
+        # Check for meeting request in AI response
+        meeting_request_pattern = r'MEETING_REQUEST:\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^\n"]+)'
+        meeting_match = re.search(meeting_request_pattern, ai_response)
+        
+        if meeting_match:
+            meeting_name = meeting_match.group(1).strip()
+            meeting_email = meeting_match.group(2).strip()
+            meeting_datetime = meeting_match.group(3).strip()
+            meeting_topic = meeting_match.group(4).strip()
+            
+            # Save meeting request to database
+            meeting_request_data = {
+                "id": str(uuid.uuid4()),
+                "session_id": session_id,
+                "name": meeting_name,
+                "email": meeting_email,
+                "phone": session.lead_phone,
+                "preferred_datetime": meeting_datetime,
+                "topic": meeting_topic,
+                "status": "pending",
+                "created_at": datetime.utcnow()
+            }
+            await db.meeting_requests.insert_one(meeting_request_data)
+            
+            # Update session with lead info
+            session.lead_name = meeting_name
+            session.lead_email = meeting_email
+            session.lead_captured = True
+            
+            # Send email to admin
+            try:
+                await send_meeting_request_email(
+                    name=meeting_name,
+                    email=meeting_email,
+                    phone=session.lead_phone or "",
+                    preferred_datetime=meeting_datetime,
+                    topic=meeting_topic
+                )
+                logger.info(f"✅ Meeting request email sent for: {meeting_email}")
+            except Exception as email_error:
+                logger.error(f"❌ Failed to send meeting request email: {str(email_error)}")
+            
+            # Clean up the AI response by removing the MEETING_REQUEST line
+            ai_response = re.sub(meeting_request_pattern, '', ai_response).strip()
+            ai_response = re.sub(r'^\s*\n', '', ai_response)  # Remove leading empty lines
+            assistant_message = ChatMessage(role="assistant", content=ai_response)
+            session.messages[-1] = assistant_message
+        
         # Save session to database
         session_dict = session.dict()
         session_dict['messages'] = [m.dict() for m in session.messages]
