@@ -768,6 +768,129 @@ const AdminDashboard = () => {
                 )}
               </div>
             )}
+
+            {activeTab === 'chatleads' && (
+              <div data-testid="admin-chatleads-section">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                  <div>
+                    <h2 className="heading-1">Chat Leads</h2>
+                    <p className="body-muted" style={{ marginTop: '8px' }}>
+                      View conversations from the AI chatbot. Leads with captured contact info are highlighted.
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <span className="body-muted">
+                      {leadsOnlySessions.length} leads captured • {allSessions.length} total conversations
+                    </span>
+                  </div>
+                </div>
+
+                {allSessions.length === 0 ? (
+                  <div style={{
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '60px',
+                    textAlign: 'center'
+                  }}>
+                    <MessageCircle size={48} color="var(--text-muted)" style={{ marginBottom: '16px' }} />
+                    <p className="body-large" style={{ color: 'var(--text-muted)' }}>
+                      No chat conversations yet. The chatbot will appear on your website after visitors accept cookies.
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: '16px' }}>
+                    {allSessions.map((session) => (
+                      <div 
+                        key={session.id} 
+                        data-testid={`chat-session-${session.id}`}
+                        style={{
+                          background: session.lead_captured ? 'linear-gradient(90deg, rgba(0,217,255,0.1) 0%, var(--bg-secondary) 100%)' : 'var(--bg-secondary)',
+                          border: session.lead_captured ? '1px solid var(--brand-primary)' : '1px solid var(--border-subtle)',
+                          padding: '20px',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          borderRadius: '4px'
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                            {session.lead_captured && (
+                              <span style={{
+                                background: 'var(--brand-primary)',
+                                color: 'black',
+                                fontSize: '11px',
+                                padding: '3px 10px',
+                                borderRadius: '12px',
+                                fontWeight: 600,
+                                textTransform: 'uppercase'
+                              }}>
+                                Lead Captured
+                              </span>
+                            )}
+                            <span className="body-muted" style={{ fontSize: '12px' }}>
+                              {session.message_count} messages
+                            </span>
+                          </div>
+                          
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                            <div>
+                              <span className="body-muted" style={{ fontSize: '12px' }}>Name</span>
+                              <p className="body-medium" style={{ color: session.lead_name ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                                {session.lead_name || 'Not provided'}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="body-muted" style={{ fontSize: '12px' }}>Email</span>
+                              <p className="body-medium" style={{ color: session.lead_email ? 'var(--brand-primary)' : 'var(--text-muted)' }}>
+                                {session.lead_email || 'Not provided'}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="body-muted" style={{ fontSize: '12px' }}>Phone</span>
+                              <p className="body-medium" style={{ color: session.lead_phone ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                                {session.lead_phone || 'Not provided'}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div style={{ marginTop: '12px' }}>
+                            <span className="body-muted" style={{ fontSize: '11px' }}>
+                              Started: {new Date(session.created_at).toLocaleString()} • 
+                              Last activity: {new Date(session.updated_at).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div style={{ display: 'flex', gap: '8px', marginLeft: '20px' }}>
+                          <Button
+                            onClick={() => handleViewSession(session.id)}
+                            className="btn-secondary"
+                            data-testid={`view-session-${session.id}`}
+                            style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                          >
+                            <Eye size={16} />
+                            View Chat
+                          </Button>
+                          <button
+                            onClick={() => handleDeleteSession(session.id)}
+                            style={{
+                              background: 'rgba(255, 0, 0, 0.1)',
+                              border: 'none',
+                              padding: '10px',
+                              cursor: 'pointer',
+                              borderRadius: '4px'
+                            }}
+                          >
+                            <Trash2 size={18} color="#ff4444" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>
