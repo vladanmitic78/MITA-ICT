@@ -313,6 +313,27 @@ const AdminDashboard = () => {
   const leadsOnlySessions = chatSessions.filter(s => s.lead_captured);
   const allSessions = chatSessions;
 
+  // Meeting request functions
+  const pendingMeetings = meetingRequests.filter(m => m.status === 'pending');
+
+  const handleUpdateMeetingStatus = async (requestId, newStatus) => {
+    try {
+      await adminAPI.updateMeetingRequestStatus(requestId, { status: newStatus });
+      setMeetingRequests(meetingRequests.map(m => 
+        m.id === requestId ? { ...m, status: newStatus } : m
+      ));
+      toast.success(`Meeting request ${newStatus}!`);
+    } catch (error) {
+      console.error('Error updating meeting status:', error);
+      toast.error('Failed to update meeting status');
+    }
+  };
+
+  const handleDeleteMeeting = async (requestId) => {
+    setItemToDelete({ id: requestId, type: 'meetingRequest' });
+    setDeleteConfirmOpen(true);
+  };
+
 
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>
