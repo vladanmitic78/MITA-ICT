@@ -63,7 +63,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(
         )
     return {"username": username}
 
-async def init_admin_user(db, username: str = "admin", password: str = "admin123", email: str = "admin@mitaict.com"):
+async def init_admin_user(db, username: str = "vladanmitic@gmail.com", password: str = "Admin123!", email: str = "vladanmitic@gmail.com"):
     """Initialize default admin user if not exists"""
     # Check if admin exists
     existing_admin = await db.admins.find_one({"username": username})
