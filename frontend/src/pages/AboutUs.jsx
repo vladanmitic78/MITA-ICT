@@ -41,17 +41,19 @@ const AboutUs = () => {
   }, []);
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }}>
-      {/* Hero Section */}
+      {/* Hero Section - SEO Optimized */}
       <section style={{
         padding: '100px 7.6923%',
         textAlign: 'center',
         background: 'var(--bg-primary)'
       }}>
         <h1 className="display-huge" style={{ marginBottom: '24px' }}>
-          {loading ? 'Loading...' : aboutContent?.title || 'About MITA ICT'}
+          About MITA ICT - IT Consulting Company Stockholm
         </h1>
-        <p className="body-large" style={{ color: 'var(--text-secondary)', maxWidth: '700px', margin: '0 auto' }}>
-          Two decades of excellence in IT and telecommunications consulting.
+        <p className="body-large" style={{ color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto' }}>
+          A trusted technology consulting services provider with 20+ years of experience 
+          delivering enterprise IT solutions, managed IT services, and digital transformation 
+          consulting across Sweden and Europe.
         </p>
       </section>
 
