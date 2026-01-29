@@ -157,25 +157,45 @@ async def update_about_content(about: AboutContentUpdate, current_user: dict = D
 # ==================== CONTACTS MANAGEMENT ====================
 
 @router.get("/contacts")
-async def get_contacts(current_user: dict = Depends(get_current_user)):
-    """Get all contacts (admin only)"""
+async def get_contacts(
+    current_user: dict = Depends(get_current_user),
+    page: int = 1,
+    limit: int = 50,
+    search: str = None
+):
+    """Get contacts with pagination (admin only)"""
     db = get_db()
-    contacts = await db.contacts.find().sort("created_at", -1).to_list(1000)
     
-    result = []
-    for contact in contacts:
-        contact_data = {
-            "id": contact.get("id"),
-            "name": contact.get("name"),
-            "email": contact.get("email"),
-            "phone": contact.get("phone"),
-            "service": contact.get("service"),
-            "comment": contact.get("comment"),
-            "created_at": contact.get("created_at")
+    # Build query filter
+    query = {}
+    if search:
+        query = {
+            "$or": [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"email": {"$regex": search, "$options": "i"}},
+                {"phone": {"$regex": search, "$options": "i"}},
+                {"service": {"$regex": search, "$options": "i"}}
+            ]
         }
-        result.append(contact_data)
     
-    return result
+    # Get total count for pagination
+    total = await db.contacts.count_documents(query)
+    
+    # Calculate skip value
+    skip = (page - 1) * limit
+    
+    # Use projection to fetch only needed fields
+    projection = {"_id": 0, "id": 1, "name": 1, "email": 1, "phone": 1, "service": 1, "comment": 1, "created_at": 1}
+    
+    contacts = await db.contacts.find(query, projection).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    return {
+        "data": contacts,
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "pages": (total + limit - 1) // limit
+    }
 
 
 @router.put("/contacts/{contact_id}")
