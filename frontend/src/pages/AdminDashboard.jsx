@@ -345,10 +345,11 @@ const AdminDashboard = () => {
         padding: '0 7.6923%'
       }}>
         <div style={{ display: 'flex', gap: '32px' }}>
-          {['services', 'saas', 'about', 'contacts'].map(tab => (
+          {['services', 'saas', 'about', 'contacts', 'chatleads'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
+              data-testid={`admin-tab-${tab}`}
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -358,10 +359,26 @@ const AdminDashboard = () => {
                 padding: '20px 0',
                 cursor: 'pointer',
                 borderBottom: activeTab === tab ? '2px solid var(--brand-primary)' : '2px solid transparent',
-                transition: 'all 0.3s'
+                transition: 'all 0.3s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
               }}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === 'chatleads' && <MessageCircle size={18} />}
+              {tab === 'chatleads' ? 'Chat Leads' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === 'chatleads' && leadsOnlySessions.length > 0 && (
+                <span style={{
+                  background: 'var(--brand-primary)',
+                  color: 'black',
+                  fontSize: '12px',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontWeight: 600
+                }}>
+                  {leadsOnlySessions.length}
+                </span>
+              )}
             </button>
           ))}
         </div>
