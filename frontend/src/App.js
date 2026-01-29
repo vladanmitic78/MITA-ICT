@@ -4,6 +4,7 @@ import { Toaster } from './components/ui/sonner';
 import { useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import CookieConsent from './components/CookieConsent';
 import Home from './pages/Home';
 import SaasStore from './pages/SaasStore';
 import AboutUs from './pages/AboutUs';
@@ -13,6 +14,7 @@ import ContactUs from './pages/ContactUs';
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminSettings = lazy(() => import('./pages/AdminSettings'));
+const SocialMediaIntegrations = lazy(() => import('./pages/SocialMediaIntegrations'));
 
 // Loading fallback component
 const LoadingFallback = () => (
