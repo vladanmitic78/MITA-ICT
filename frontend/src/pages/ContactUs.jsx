@@ -203,17 +203,18 @@ const ContactUs = () => {
 
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', paddingTop: '80px' }} id="contact-page">
-      {/* Hero Section */}
+      {/* Hero Section - SEO Optimized */}
       <section style={{
         padding: '100px 7.6923%',
         textAlign: 'center',
         background: 'var(--bg-primary)'
       }} id="contact-form-top">
         <h1 className="display-huge" style={{ marginBottom: '24px' }}>
-          Get In Touch
+          Contact MITA ICT - IT Consulting Stockholm
         </h1>
-        <p className="body-large" style={{ color: 'var(--text-secondary)', maxWidth: '700px', margin: '0 auto' }}>
-          Have a question or ready to start a project? We'd love to hear from you.
+        <p className="body-large" style={{ color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto' }}>
+          Ready to discuss your IT strategy, cloud migration, or digital transformation project? 
+          Our IT consulting experts in Stockholm are here to help. Schedule a free consultation today.
         </p>
       </section>
 
