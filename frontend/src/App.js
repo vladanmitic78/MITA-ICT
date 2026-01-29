@@ -86,7 +86,8 @@ function App() {
           </Suspense>
         </main>
         <Footer />
-        <CookieConsent />
+        <CookieConsent onAccept={() => setCookiesAccepted(true)} />
+        {cookiesAccepted && <Chatbot />}
         <Toaster />
       </BrowserRouter>
     </div>
