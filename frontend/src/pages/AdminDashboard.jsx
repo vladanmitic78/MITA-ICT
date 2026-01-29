@@ -204,6 +204,10 @@ const AdminDashboard = () => {
         await adminAPI.deleteChatSession(id);
         setChatSessions(chatSessions.filter(s => s.id !== id));
         toast.success('Chat session deleted successfully!');
+      } else if (type === 'meetingRequest') {
+        await adminAPI.deleteMeetingRequest(id);
+        setMeetingRequests(meetingRequests.filter(m => m.id !== id));
+        toast.success('Meeting request deleted successfully!');
       }
       
       setDeleteConfirmOpen(false);
