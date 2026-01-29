@@ -107,7 +107,12 @@ export const adminAPI = {
   // Chat Sessions (Admin)
   getChatSessions: () => apiClient.get('/admin/chat-sessions'),
   getChatSession: (id) => apiClient.get(`/admin/chat-sessions/${id}`),
-  deleteChatSession: (id) => apiClient.delete(`/admin/chat-sessions/${id}`)
+  deleteChatSession: (id) => apiClient.delete(`/admin/chat-sessions/${id}`),
+  
+  // Meeting Requests (Admin)
+  getMeetingRequests: () => apiClient.get('/admin/meeting-requests'),
+  updateMeetingRequestStatus: (id, data) => apiClient.put(`/admin/meeting-requests/${id}/status`, data),
+  deleteMeetingRequest: (id) => apiClient.delete(`/admin/meeting-requests/${id}`)
 };
 
 // Chatbot API (Public)
