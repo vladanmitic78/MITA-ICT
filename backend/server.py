@@ -1025,6 +1025,68 @@ async def delete_chat_session(
     logger.info(f"✅ Chat session deleted: {session_id}")
     return {"message": "Chat session deleted successfully"}
 
+# ==================== MEETING REQUEST ENDPOINTS ====================
+
+@api_router.get("/admin/meeting-requests")
+async def get_meeting_requests(current_user: dict = Depends(get_current_user)):
+    """Get all meeting requests (admin only)"""
+    requests = await db.meeting_requests.find().sort("created_at", -1).to_list(1000)
+    
+    result = []
+    for req in requests:
+        request_data = {
+            "id": req.get("id"),
+            "session_id": req.get("session_id"),
+            "name": req.get("name"),
+            "email": req.get("email"),
+            "phone": req.get("phone"),
+            "preferred_datetime": req.get("preferred_datetime"),
+            "topic": req.get("topic"),
+            "status": req.get("status", "pending"),
+            "created_at": req.get("created_at"),
+            "admin_notes": req.get("admin_notes")
+        }
+        result.append(request_data)
+    
+    return result
+
+@api_router.put("/admin/meeting-requests/{request_id}/status")
+async def update_meeting_request_status(
+    request_id: str,
+    status_update: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update meeting request status (admin only)"""
+    new_status = status_update.get("status")
+    admin_notes = status_update.get("admin_notes", "")
+    
+    if new_status not in ["pending", "approved", "rejected"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    result = await db.meeting_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": new_status, "admin_notes": admin_notes}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Meeting request not found")
+    
+    logger.info(f"✅ Meeting request {request_id} updated to {new_status}")
+    return {"message": f"Meeting request {new_status} successfully"}
+
+@api_router.delete("/admin/meeting-requests/{request_id}")
+async def delete_meeting_request(
+    request_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a meeting request (admin only)"""
+    result = await db.meeting_requests.delete_one({"id": request_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Meeting request not found")
+    
+    logger.info(f"✅ Meeting request deleted: {request_id}")
+    return {"message": "Meeting request deleted successfully"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
