@@ -29,13 +29,14 @@ from models import (
     AboutContent, AboutContentUpdate,
     AdminLogin, Token, Admin, ChangePassword,
     SocialIntegrations,
-    ChatMessage, ChatSession, ChatRequest, ChatResponse
+    ChatMessage, ChatSession, ChatRequest, ChatResponse,
+    MeetingRequest, MeetingRequestCreate
 )
 from auth import (
     verify_password, get_password_hash, create_access_token, 
     get_current_user, init_admin_user
 )
-from email_service import send_contact_email, send_auto_response_email
+from email_service import send_contact_email, send_auto_response_email, send_meeting_request_email
 
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL')
