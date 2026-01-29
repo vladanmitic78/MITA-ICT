@@ -12,9 +12,25 @@ Build a full-stack consulting website for "MITA ICT" with a dark-themed, convers
 
 ## Tech Stack
 - **Frontend**: React, Tailwind CSS, Shadcn/UI
-- **Backend**: FastAPI, Python
+- **Backend**: FastAPI, Python (modular router architecture)
 - **Database**: MongoDB
 - **AI Integration**: Claude Sonnet 4 via Emergent Universal Key (emergentintegrations library)
+
+## Backend Architecture (Refactored)
+```
+/app/backend/
+├── server.py          # Main app entry point
+├── routes/
+│   ├── __init__.py    # Router exports
+│   ├── public.py      # Public API (services, products, about)
+│   ├── contacts.py    # Contact form submission
+│   ├── auth.py        # Admin authentication
+│   ├── admin.py       # Admin CRUD operations
+│   └── chat.py        # Chatbot & meeting requests
+├── models.py          # Pydantic models
+├── auth.py            # JWT authentication
+└── email_service.py   # Email notifications
+```
 
 ## Implemented Features
 
