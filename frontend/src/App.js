@@ -64,6 +64,7 @@ function App() {
           </Suspense>
         </main>
         <Footer />
+        <CookieConsent />
         <Toaster />
       </BrowserRouter>
     </div>
