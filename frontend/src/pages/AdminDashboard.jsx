@@ -76,7 +76,9 @@ const AdminDashboard = () => {
       ]);
       setServices(servicesRes.data || []);
       setSaasProducts(productsRes.data || []);
-      setContacts(contactsRes.data || []);
+      // Handle paginated contacts response
+      const contactsData = contactsRes.data;
+      setContacts(contactsData?.data || contactsData || []);
       setAboutContent(aboutRes.data || null);
       setChatSessions(chatSessionsRes.data || []);
       setMeetingRequests(meetingRequestsRes.data || []);
