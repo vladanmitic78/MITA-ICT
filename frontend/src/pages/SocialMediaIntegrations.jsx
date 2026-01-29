@@ -29,8 +29,7 @@ const SocialMediaIntegrations = () => {
       enabled: false,
       pixelId: '',
       accessToken: '',
-      advertis
-erId: '',
+      advertiserId: '',
     },
     linkedin: {
       enabled: false,
