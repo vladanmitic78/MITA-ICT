@@ -773,47 +773,6 @@ async def update_social_integrations(
     logger.info("✅ Social media integrations updated")
     return SocialIntegrations(**integration_dict)
 
-            
-            ws.append([
-                contact.get('name', 'N/A'),
-                contact.get('email', 'N/A'),
-                contact.get('phone', 'N/A'),
-                contact.get('service', 'N/A'),
-                contact.get('comment', 'No comment provided'),
-                created_at.strftime('%Y-%m-%d %H:%M')
-            ])
-        
-        # Adjust column widths
-        ws.column_dimensions['A'].width = 20
-        ws.column_dimensions['B'].width = 30
-        ws.column_dimensions['C'].width = 15
-        ws.column_dimensions['D'].width = 25
-        ws.column_dimensions['E'].width = 40
-        ws.column_dimensions['F'].width = 20
-        
-        # Save to buffer
-        buffer = io.BytesIO()
-        wb.save(buffer)
-        buffer.seek(0)
-        
-        logger.info(f"✅ Excel export generated: {len(contacts)} contacts")
-        
-        return StreamingResponse(
-            buffer,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={
-                "Content-Disposition": f"attachment; filename=mita_contacts_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.xlsx"
-            }
-        )
-        
-    except Exception as e:
-        logger.error(f"❌ Excel export failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate Excel: {str(e)}"
-        )
-
-
 # Include the router in the main app
 app.include_router(api_router)
 
