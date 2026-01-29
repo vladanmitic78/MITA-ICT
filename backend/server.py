@@ -1,1094 +1,195 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+"""
+MITA ICT Backend Server
+Main application file - uses modular routers for endpoints
+"""
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 from pathlib import Path
 import os
 import logging
 from datetime import datetime
-from typing import List
-import httpx
-import io
-import uuid
-from reportlab.lib.pagesizes import letter, A4
-from reportlab.lib import colors
-from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment, PatternFill
 
-# Setup - Load environment variables BEFORE importing modules that use them
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-from models import (
-    Service, ServiceCreate, ServiceUpdate,
-    SaasProduct, SaasProductCreate, SaasProductUpdate,
-    Contact, ContactCreate, ContactUpdate,
-    AboutContent, AboutContentUpdate,
-    AdminLogin, Token, Admin, ChangePassword,
-    SocialIntegrations,
-    ChatMessage, ChatSession, ChatRequest, ChatResponse,
-    MeetingRequest, MeetingRequestCreate
+# Import routers
+from routes import (
+    public_router,
+    contacts_router,
+    auth_router,
+    admin_router,
+    chat_router
 )
-from auth import (
-    verify_password, get_password_hash, create_access_token, 
-    get_current_user, init_admin_user
+from auth import init_admin_user
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="MITA ICT API",
+    description="Backend API for MITA ICT Consulting Website",
+    version="2.0.0"
 )
-from email_service import send_contact_email, send_auto_response_email, send_meeting_request_email
-
-# MongoDB connection
-mongo_url = os.environ.get('MONGO_URL')
-if not mongo_url:
-    raise ValueError('MONGO_URL environment variable is required')
-
-client = AsyncIOMotorClient(mongo_url)
-
-db_name = os.environ.get('DB_NAME')
-if not db_name:
-    raise ValueError('DB_NAME environment variable is required')
-
-db = client[db_name]
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-# Create the main app
-app = FastAPI()
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
 
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ==================== STARTUP & INITIALIZATION ====================
+# Database connection
+MONGO_URL = os.environ.get('MONGO_URL')
+DB_NAME = os.environ.get('DB_NAME', 'mita_ict')
+
+client = None
+db = None
+
 
 @app.on_event("startup")
 async def startup_db_client():
-    """Initialize database with default data"""
-    logger.info("🚀 Starting MITA ICT Backend...")
+    """Initialize database connection and seed data on startup"""
+    global client, db
     
-    # Migrate old admin to new credentials
-    old_admin = await db.admins.find_one({"username": "admin"})
-    if old_admin:
-        await db.admins.delete_one({"username": "admin"})
-        logger.info("✅ Old admin user removed")
+    try:
+        client = AsyncIOMotorClient(MONGO_URL)
+        db = client[DB_NAME]
+        
+        # Initialize admin user if not exists
+        await init_admin_user(db)
+        
+        # Seed default data if collections are empty
+        await seed_default_data()
+        
+        logger.info("✅ Database initialized successfully")
+        
+    except Exception as e:
+        logger.error(f"❌ Database connection failed: {str(e)}")
+        raise
+
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    """Close database connection on shutdown"""
+    global client
+    if client:
+        client.close()
+        logger.info("✅ Database connection closed")
+
+
+async def seed_default_data():
+    """Seed default services and products if database is empty"""
+    global db
     
-    # Initialize admin user with new credentials
-    await init_admin_user(db)
-    
-    # Initialize default services if none exist
+    # Seed services if empty
     services_count = await db.services.count_documents({})
     if services_count == 0:
         default_services = [
             {
-                "id": "1",
-                "title": "IT and Telecommunication",
-                "description": "Comprehensive IT and telecom consulting services with 20+ years of industry experience. From infrastructure to advanced solutions.",
-                "icon": "Network",
+                "id": "service-1",
+                "title": "IT and Telecommunication Consulting",
+                "description": "Comprehensive IT and telecom consulting services including infrastructure, network optimization, and advanced solutions.",
+                "icon": "network",
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             },
             {
-                "id": "2",
+                "id": "service-2",
                 "title": "Company Registration in Sweden",
-                "description": "Complete support for company registration and business setup in Sweden. Navigate Swedish regulations with ease.",
-                "icon": "Building2",
+                "description": "Complete support for company registration and business setup in Sweden.",
+                "icon": "building",
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             },
             {
-                "id": "3",
+                "id": "service-3",
                 "title": "Leading Teams",
-                "description": "Expert leadership consulting for sales and engineering teams. Build high-performing organizations.",
-                "icon": "Users",
+                "description": "Expert leadership consulting for sales and engineering teams.",
+                "icon": "users",
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
         ]
         await db.services.insert_many(default_services)
-        logger.info("✅ Default services initialized")
+        logger.info("✅ Default services seeded")
     
-    # Initialize default SaaS products if none exist
-    saas_count = await db.saas_products.count_documents({})
-    if saas_count == 0:
+    # Seed SaaS products if empty
+    products_count = await db.saas_products.count_documents({})
+    if products_count == 0:
         default_products = [
             {
-                "id": "1",
-                "title": "MITACRM",
-                "description": "Powerful CRM solution designed for modern businesses. Streamline your customer relationships.",
-                "link": "https://mitacrm.com/",
-                "features": ["Contact Management", "Sales Pipeline", "Analytics Dashboard", "Integration Ready"],
+                "id": "product-1",
+                "name": "MITACRM",
+                "description": "Powerful CRM solution for modern businesses",
+                "url": "https://mitacrm.com",
+                "features": ["Contact Management", "Sales Pipeline", "Reporting"],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             },
             {
-                "id": "2",
-                "title": "Routing System",
-                "description": "Advanced routing system for telecommunications and network management.",
-                "link": "https://trustcode.dev/",
-                "features": ["Smart Routing", "Real-time Monitoring", "Scalable Architecture", "API Access"],
+                "id": "product-2",
+                "name": "Routing System",
+                "description": "Advanced routing for telecommunications",
+                "url": "https://routing.mitaict.com",
+                "features": ["Smart Routing", "Load Balancing", "Analytics"],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             },
             {
-                "id": "3",
-                "title": "White Label Software",
-                "description": "Customizable white label solutions for your business needs.",
-                "link": "#",
-                "features": ["Full Customization", "Your Branding", "Quick Deployment", "Ongoing Support"],
+                "id": "product-3",
+                "name": "White Label Software",
+                "description": "Customizable solutions for your brand",
+                "url": "https://whitelabel.mitaict.com",
+                "features": ["Full Customization", "API Access", "Support"],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
         ]
         await db.saas_products.insert_many(default_products)
-        logger.info("✅ Default SaaS products initialized")
+        logger.info("✅ Default SaaS products seeded")
     
-    # Initialize default About content if none exists
+    # Seed about content if empty
     about_count = await db.about_content.count_documents({})
     if about_count == 0:
         default_about = {
-            "id": "1",
-            "title": "About MITA ICT",
-            "content": "We bring over 20 years of distinguished experience in the IT and telecommunications industry. Our journey has been marked by successfully leading sales and engineering teams, implementing cutting-edge solutions, and driving organizational excellence.\n\nOur expertise spans across multiple domains including IT infrastructure, telecommunications networks, and enterprise software solutions. We have a proven track record in selling and implementing sophisticated software systems such as OSS (Operations Support Systems), OBS (Order and Billing Systems), and comprehensive cybersecurity solutions including EDR (Endpoint Detection and Response), MDR (Managed Detection and Response), and XDR (Extended Detection and Response).\n\nAt MITA ICT, client satisfaction is not just a goal—it's our foundation. We pride ourselves on understanding our clients' unique challenges and delivering tailored solutions that drive real business value. Our approach combines technical excellence with strategic thinking, ensuring that technology serves your business objectives.\n\nWhether you're looking to optimize your IT infrastructure, implement new telecommunications systems, or build high-performing teams, we bring the experience, expertise, and dedication to help you succeed.",
+            "id": "about-1",
+            "story": "MITA ICT has been at the forefront of IT and telecommunications consulting for over 20 years, helping businesses transform their digital infrastructure.",
             "expertise": [
                 {
-                    "title": "IT Infrastructure",
-                    "items": ["Network Design", "Cloud Solutions", "System Integration"]
+                    "title": "Network Infrastructure",
+                    "description": "Design and implementation of robust network solutions"
                 },
                 {
-                    "title": "Telecommunications",
-                    "items": ["OSS Implementation", "Network Optimization", "Voice & Data Solutions"]
+                    "title": "Cloud Solutions",
+                    "description": "Migration and management of cloud-based systems"
                 },
                 {
-                    "title": "Cybersecurity",
-                    "items": ["EDR/MDR/XDR Solutions", "Security Audits", "Compliance Management"]
-                },
-                {
-                    "title": "Leadership",
-                    "items": ["Team Building", "Sales Management", "P&L Optimization"]
+                    "title": "Telecom Integration",
+                    "description": "Seamless integration of voice and data communications"
                 }
             ],
+            "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow()
         }
         await db.about_content.insert_one(default_about)
-        logger.info("✅ Default About content initialized")
-    
-    logger.info("✅ Database initialized successfully")
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
-    logger.info("🔴 Database connection closed")
-
-# ==================== PUBLIC ENDPOINTS ====================
-
-@api_router.get("/")
-async def root():
-    return {"message": "MITA ICT API - Where Technology Meets Strategy"}
-
-@api_router.get("/services", response_model=List[Service])
-async def get_services():
-    """Get all consulting services"""
-    services = await db.services.find().to_list(1000)
-    return [Service(**service) for service in services]
-
-@api_router.get("/saas-products", response_model=List[SaasProduct])
-async def get_saas_products():
-    """Get all SaaS products"""
-    products = await db.saas_products.find().to_list(1000)
-    return [SaasProduct(**product) for product in products]
-
-@api_router.get("/about", response_model=AboutContent)
-async def get_about_content():
-    """Get About page content"""
-    about = await db.about_content.find_one()
-    if not about:
-        raise HTTPException(status_code=404, detail="About content not found")
-    return AboutContent(**about)
-
-@api_router.post("/contact", response_model=dict)
-async def submit_contact(contact: ContactCreate):
-    """Submit contact form"""
-    try:
-        # Verify reCAPTCHA token
-        recaptcha_secret = os.environ.get('RECAPTCHA_SECRET_KEY', '')
-        if recaptcha_secret and recaptcha_secret != 'YOUR_RECAPTCHA_SECRET_KEY':
-            async with httpx.AsyncClient() as client_http:
-                recaptcha_response = await client_http.post(
-                    'https://www.google.com/recaptcha/api/siteverify',
-                    data={
-                        'secret': recaptcha_secret,
-                        'response': contact.recaptcha_token
-                    }
-                )
-                recaptcha_result = recaptcha_response.json()
-                
-                if not recaptcha_result.get('success'):
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="reCAPTCHA verification failed"
-                    )
-        
-        # Save to database
-        contact_data = Contact(
-            name=contact.name,
-            email=contact.email,
-            phone=contact.phone,
-            service=contact.service,
-            comment=contact.comment
-        )
-        await db.contacts.insert_one(contact_data.dict())
-        
-        # Send email notifications
-        try:
-            # Send notification to admin
-            await send_contact_email(
-                name=contact.name,
-                email=contact.email,
-                phone=contact.phone,
-                service=contact.service,
-                comment=contact.comment
-            )
-            logger.info(f"✅ Admin notification email sent for: {contact.email}")
-            
-            # Send auto-response to user
-            await send_auto_response_email(
-                name=contact.name,
-                email=contact.email,
-                phone=contact.phone,
-                service=contact.service
-            )
-            logger.info(f"✅ Auto-response email sent to: {contact.email}")
-            
-        except Exception as e:
-            logger.error(f"❌ Email sending failed: {str(e)}")
-            # Still save to database even if email fails
-        
-        return {
-            "success": True,
-            "message": "Thank you for contacting us. We will get back to you soon!"
-        }
-        
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        logger.error(f"❌ Contact form submission failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to submit contact form"
-        )
-
-# ==================== ADMIN AUTHENTICATION ====================
-
-@api_router.post("/admin/login", response_model=Token)
-async def admin_login(credentials: AdminLogin):
-    """Admin login with username/password"""
-    admin = await db.admins.find_one({"username": credentials.username})
-    
-    if not admin or not verify_password(credentials.password, admin["password_hash"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    access_token = create_access_token(data={"sub": admin["username"]})
-    logger.info(f"✅ Admin logged in: {credentials.username}")
-    
-    return {"access_token": access_token, "token_type": "bearer"}
-
-@api_router.post("/admin/google-login", response_model=Token)
-async def admin_google_login():
-    """Admin login with Google OAuth (mock for now)"""
-    # For MVP, we'll create a token for Google login
-    # In production, this would verify Google OAuth token
-    access_token = create_access_token(data={"sub": "google_admin"})
-    logger.info(f"✅ Admin logged in via Google")
-    
-    return {"access_token": access_token, "token_type": "bearer"}
-
-@api_router.post("/admin/logout")
-async def admin_logout(current_user: dict = Depends(get_current_user)):
-    """Admin logout"""
-    logger.info(f"✅ Admin logged out: {current_user['username']}")
-    return {"message": "Successfully logged out"}
-
-@api_router.post("/admin/change-password")
-async def change_password(
-    password_data: ChangePassword,
-    current_user: dict = Depends(get_current_user)
-):
-    """Change admin password"""
-    username = current_user['username']
-    admin = await db.admins.find_one({"username": username})
-    
-    if not admin:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Admin user not found"
-        )
-    
-    # Verify current password
-    if not verify_password(password_data.current_password, admin["password_hash"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Current password is incorrect"
-        )
-    
-    # Update password
-    new_password_hash = get_password_hash(password_data.new_password)
-    await db.admins.update_one(
-        {"username": username},
-        {"$set": {"password_hash": new_password_hash}}
-    )
-    
-    logger.info(f"✅ Password changed for admin: {username}")
-    return {"message": "Password updated successfully"}
-
-# ==================== PROTECTED ADMIN ENDPOINTS ====================
-
-@api_router.get("/admin/contacts", response_model=List[Contact])
-async def get_contacts(current_user: dict = Depends(get_current_user)):
-    """Get all contact submissions (admin only)"""
-    contacts = await db.contacts.find().sort("created_at", -1).to_list(1000)
-    return [Contact(**contact) for contact in contacts]
+        logger.info("✅ Default about content seeded")
 
 
-# Contact Management
-@api_router.put("/admin/contacts/{contact_id}", response_model=Contact)
-async def update_contact(
-    contact_id: str,
-    contact: ContactUpdate,
-    current_user: dict = Depends(get_current_user)
-):
-    """Update contact (admin only)"""
-    existing_contact = await db.contacts.find_one({"id": contact_id})
-    if not existing_contact:
-        raise HTTPException(status_code=404, detail="Contact not found")
-    
-    update_data = contact.dict()
-    
-    await db.contacts.update_one(
-        {"id": contact_id},
-        {"$set": update_data}
-    )
-    
-    updated_contact = await db.contacts.find_one({"id": contact_id})
-    logger.info(f"✅ Contact updated: {contact_id}")
-    return Contact(**updated_contact)
+# Include all routers
+app.include_router(public_router)
+app.include_router(contacts_router)
+app.include_router(auth_router)
+app.include_router(admin_router)
+app.include_router(chat_router)
 
-@api_router.delete("/admin/contacts/{contact_id}")
-async def delete_contact(
-    contact_id: str,
-    current_user: dict = Depends(get_current_user)
-):
-    """Delete contact (admin only)"""
-    result = await db.contacts.delete_one({"id": contact_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Contact not found")
-    
-    logger.info(f"✅ Contact deleted: {contact_id}")
-    return {"message": "Contact deleted successfully"}
-
-
-# Service Management
-@api_router.post("/admin/services", response_model=Service)
-async def create_service(
-    service: ServiceCreate,
-    current_user: dict = Depends(get_current_user)
-):
-    """Create new service (admin only)"""
-    service_data = Service(**service.dict())
-    await db.services.insert_one(service_data.dict())
-    logger.info(f"✅ Service created: {service_data.title}")
-    return service_data
-
-@api_router.put("/admin/services/{service_id}", response_model=Service)
-async def update_service(
-    service_id: str,
-    service: ServiceUpdate,
-    current_user: dict = Depends(get_current_user)
-):
-    """Update service (admin only)"""
-    existing_service = await db.services.find_one({"id": service_id})
-    if not existing_service:
-        raise HTTPException(status_code=404, detail="Service not found")
-    
-    update_data = service.dict()
-    update_data["updated_at"] = datetime.utcnow()
-    
-    await db.services.update_one(
-        {"id": service_id},
-        {"$set": update_data}
-    )
-    
-    updated_service = await db.services.find_one({"id": service_id})
-    logger.info(f"✅ Service updated: {service_id}")
-    return Service(**updated_service)
-
-@api_router.delete("/admin/services/{service_id}")
-async def delete_service(
-    service_id: str,
-    current_user: dict = Depends(get_current_user)
-):
-    """Delete service (admin only)"""
-    result = await db.services.delete_one({"id": service_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Service not found")
-    
-    logger.info(f"✅ Service deleted: {service_id}")
-    return {"message": "Service deleted successfully"}
-
-# SaaS Product Management
-@api_router.post("/admin/saas-products", response_model=SaasProduct)
-async def create_saas_product(
-    product: SaasProductCreate,
-    current_user: dict = Depends(get_current_user)
-):
-    """Create new SaaS product (admin only)"""
-    product_data = SaasProduct(**product.dict())
-    await db.saas_products.insert_one(product_data.dict())
-    logger.info(f"✅ SaaS product created: {product_data.title}")
-    return product_data
-
-@api_router.put("/admin/saas-products/{product_id}", response_model=SaasProduct)
-async def update_saas_product(
-    product_id: str,
-    product: SaasProductUpdate,
-    current_user: dict = Depends(get_current_user)
-):
-    """Update SaaS product (admin only)"""
-    existing_product = await db.saas_products.find_one({"id": product_id})
-    if not existing_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    update_data = product.dict()
-    update_data["updated_at"] = datetime.utcnow()
-    
-    await db.saas_products.update_one(
-        {"id": product_id},
-        {"$set": update_data}
-    )
-    
-    updated_product = await db.saas_products.find_one({"id": product_id})
-    logger.info(f"✅ SaaS product updated: {product_id}")
-    return SaasProduct(**updated_product)
-
-@api_router.delete("/admin/saas-products/{product_id}")
-async def delete_saas_product(
-    product_id: str,
-    current_user: dict = Depends(get_current_user)
-):
-    """Delete SaaS product (admin only)"""
-    result = await db.saas_products.delete_one({"id": product_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    logger.info(f"✅ SaaS product deleted: {product_id}")
-    return {"message": "Product deleted successfully"}
-
-# About Content Management
-@api_router.put("/admin/about", response_model=AboutContent)
-async def update_about_content(
-    about: AboutContentUpdate,
-    current_user: dict = Depends(get_current_user)
-):
-    """Update About page content (admin only)"""
-    existing_about = await db.about_content.find_one()
-    
-    if not existing_about:
-        # Create new about content if none exists
-        about_data = AboutContent(
-            title=about.title,
-            content=about.content
-        )
-        await db.about_content.insert_one(about_data.dict())
-        logger.info(f"✅ About content created")
-        return about_data
-    
-    # Update existing content
-    update_data = about.dict()
-    update_data["updated_at"] = datetime.utcnow()
-    
-    await db.about_content.update_one(
-        {"id": existing_about["id"]},
-        {"$set": update_data}
-    )
-    
-    updated_about = await db.about_content.find_one({"id": existing_about["id"]})
-    logger.info(f"✅ About content updated")
-    return AboutContent(**updated_about)
-
-# Export Endpoints
-@api_router.get("/admin/contacts/export/pdf")
-async def export_contacts_pdf(current_user: dict = Depends(get_current_user)):
-    """Export contacts to PDF (admin only)"""
-    try:
-        contacts = await db.contacts.find().sort("created_at", -1).to_list(1000)
-        
-        # Create PDF in memory
-        buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=50, bottomMargin=30)
-        
-        # Container for the 'Flowable' objects
-        elements = []
-        
-        # Add title
-        styles = getSampleStyleSheet()
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=24,
-            textColor=colors.HexColor('#00D9FF'),
-            spaceAfter=30,
-            alignment=1  # Center alignment
-        )
-        title = Paragraph("MITA ICT - Contact Submissions", title_style)
-        elements.append(title)
-        elements.append(Spacer(1, 12))
-        
-        # Add export date
-        date_style = ParagraphStyle(
-            'DateStyle',
-            parent=styles['Normal'],
-            fontSize=10,
-            textColor=colors.grey,
-            alignment=1
-        )
-        export_date = Paragraph(f"Exported on: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}", date_style)
-        elements.append(export_date)
-        elements.append(Spacer(1, 20))
-        
-        if contacts:
-            # Prepare table data
-            table_data = [['Name', 'Email', 'Phone', 'Service', 'Date']]
-            
-            for contact in contacts:
-                created_at = contact.get('created_at', datetime.utcnow())
-                if isinstance(created_at, str):
-                    created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-                
-                table_data.append([
-                    contact.get('name', 'N/A'),
-                    contact.get('email', 'N/A'),
-                    contact.get('phone', 'N/A'),
-                    contact.get('service', 'N/A'),
-                    created_at.strftime('%Y-%m-%d')
-                ])
-            
-            # Create table
-            table = Table(table_data, colWidths=[1.5*inch, 2*inch, 1.5*inch, 1.5*inch, 1*inch])
-            table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#00D9FF')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 10),
-                ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f5f5')]),
-            ]))
-            elements.append(table)
-            
-            # Add details section for comments
-            elements.append(Spacer(1, 30))
-            details_title = Paragraph("<b>Contact Details with Comments:</b>", styles['Heading2'])
-            elements.append(details_title)
-            elements.append(Spacer(1, 12))
-            
-            for i, contact in enumerate(contacts, 1):
-                detail_style = styles['Normal']
-                detail_text = f"""
-                <b>{i}. {contact.get('name', 'N/A')}</b><br/>
-                Email: {contact.get('email', 'N/A')}<br/>
-                Phone: {contact.get('phone', 'N/A')}<br/>
-                Service: {contact.get('service', 'N/A')}<br/>
-                Comment: {contact.get('comment', 'No comment provided')}<br/>
-                Date: {created_at.strftime('%Y-%m-%d %H:%M')}
-                """
-                elements.append(Paragraph(detail_text, detail_style))
-                elements.append(Spacer(1, 15))
-        else:
-            no_data = Paragraph("No contact submissions available.", styles['Normal'])
-            elements.append(no_data)
-        
-        # Build PDF
-        doc.build(elements)
-        buffer.seek(0)
-        
-        logger.info(f"✅ PDF export generated: {len(contacts)} contacts")
-        
-        return StreamingResponse(
-            buffer,
-            media_type="application/pdf",
-            headers={
-                "Content-Disposition": f"attachment; filename=mita_contacts_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.pdf"
-            }
-        )
-        
-    except Exception as e:
-        logger.error(f"❌ PDF export failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate PDF: {str(e)}"
-        )
-
-@api_router.get("/admin/contacts/export/excel")
-async def export_contacts_excel(current_user: dict = Depends(get_current_user)):
-    """Export contacts to Excel (admin only)"""
-    try:
-        contacts = await db.contacts.find().sort("created_at", -1).to_list(1000)
-        
-        # Create Excel workbook
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Contacts"
-        
-        # Add title
-        ws.merge_cells('A1:F1')
-        title_cell = ws['A1']
-        title_cell.value = 'MITA ICT - Contact Submissions'
-        title_cell.font = Font(size=16, bold=True, color="000000")
-        title_cell.alignment = Alignment(horizontal='center', vertical='center')
-        title_cell.fill = PatternFill(start_color="00D9FF", end_color="00D9FF", fill_type="solid")
-        
-        # Add export date
-        ws.merge_cells('A2:F2')
-        date_cell = ws['A2']
-        date_cell.value = f"Exported on: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}"
-        date_cell.font = Font(size=10, italic=True)
-        date_cell.alignment = Alignment(horizontal='center')
-        
-        # Add headers
-        headers = ['Name', 'Email', 'Phone', 'Service', 'Comment', 'Submitted Date']
-        ws.append([])  # Empty row
-        ws.append(headers)
-        
-        # Style headers
-        header_row = ws[4]
-        for cell in header_row:
-            cell.font = Font(bold=True, color="FFFFFF")
-            cell.fill = PatternFill(start_color="333333", end_color="333333", fill_type="solid")
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-        
-        # Add data
-        for contact in contacts:
-            created_at = contact.get('created_at', datetime.utcnow())
-            if isinstance(created_at, str):
-                created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-
-            
-            ws.append([
-                contact.get('name', 'N/A'),
-                contact.get('email', 'N/A'),
-                contact.get('phone', 'N/A'),
-                contact.get('service', 'N/A'),
-                contact.get('comment', 'No comment provided'),
-                created_at.strftime('%Y-%m-%d %H:%M')
-            ])
-        
-        # Adjust column widths
-        ws.column_dimensions['A'].width = 20
-        ws.column_dimensions['B'].width = 30
-        ws.column_dimensions['C'].width = 15
-        ws.column_dimensions['D'].width = 25
-        ws.column_dimensions['E'].width = 40
-        ws.column_dimensions['F'].width = 20
-        
-        # Save to buffer
-        buffer = io.BytesIO()
-        wb.save(buffer)
-        buffer.seek(0)
-        
-        logger.info(f"✅ Excel export generated: {len(contacts)} contacts")
-        
-        return StreamingResponse(
-            buffer,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={
-                "Content-Disposition": f"attachment; filename=mita_contacts_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.xlsx"
-            }
-        )
-        
-    except Exception as e:
-        logger.error(f"❌ Excel export failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate Excel: {str(e)}"
-        )
-
-
-
-# Social Media Integrations Endpoints
-@api_router.get("/admin/social-integrations", response_model=SocialIntegrations)
-async def get_social_integrations(current_user: dict = Depends(get_current_user)):
-    """Get social media integrations (admin only)"""
-    integration = await db.social_integrations.find_one()
-    if not integration:
-        # Create default integration
-        default_integration = SocialIntegrations().dict()
-        await db.social_integrations.insert_one(default_integration)
-        logger.info("✅ Default social integrations created")
-        return SocialIntegrations(**default_integration)
-    
-    return SocialIntegrations(**integration)
-
-@api_router.put("/admin/social-integrations", response_model=SocialIntegrations)
-async def update_social_integrations(
-    integrations: SocialIntegrations,
-    current_user: dict = Depends(get_current_user)
-):
-    """Update social media integrations (admin only)"""
-    existing = await db.social_integrations.find_one()
-    
-    integration_dict = integrations.dict()
-    integration_dict['updated_at'] = datetime.utcnow()
-    
-    if existing:
-        # Update existing
-        integration_dict['id'] = existing['id']
-        await db.social_integrations.update_one(
-            {"id": existing['id']},
-            {"$set": integration_dict}
-        )
-    else:
-        # Create new
-        await db.social_integrations.insert_one(integration_dict)
-    
-    logger.info("✅ Social media integrations updated")
-    return SocialIntegrations(**integration_dict)
-
-# ==================== CHATBOT ENDPOINTS ====================
-
-from emergentintegrations.llm.chat import LlmChat, UserMessage
-
-# System prompt for the chatbot
-CHATBOT_SYSTEM_PROMPT = """You are a friendly and professional sales assistant for MITA ICT, a consulting company with 20+ years of experience in IT and telecommunications. Your goal is to help visitors understand our services and guide them toward scheduling a meeting.
-
-Our Services:
-1. IT and Telecommunication Consulting - Infrastructure, network optimization, and advanced solutions.
-2. Company Registration in Sweden - Complete support for business setup in Sweden.
-3. Leading Teams - Expert leadership consulting for sales and engineering teams.
-
-Our SaaS Products:
-1. MITACRM - CRM solution for modern businesses
-2. Routing System - Advanced routing for telecommunications
-3. White Label Software - Customizable solutions
-
-MEETING SCHEDULING - IMPORTANT:
-When a user wants to schedule a meeting or consultation:
-1. Ask for their name if you don't have it
-2. Ask for their email address
-3. Ask for their preferred date and time (be flexible, suggest "this week" or "next week" options)
-4. Optionally ask what they'd like to discuss
-
-Once you have name, email, and preferred time, respond with EXACTLY this format (the system will detect it):
-"MEETING_REQUEST: [name] | [email] | [preferred_datetime] | [topic]"
-
-Then immediately follow with a friendly confirmation like:
-"Perfect! I've submitted your meeting request. Our team at info@mitaict.com will review it and confirm the time slot with you shortly. Is there anything else I can help you with?"
-
-Guidelines:
-- Be warm, helpful, and conversational
-- Answer questions about services briefly (2-3 sentences)
-- After 2-3 exchanges, suggest scheduling a free consultation call
-- If they share contact info, acknowledge warmly
-- Keep responses concise unless they ask for details
-- For pricing questions, suggest a call to discuss their specific needs
-
-Example meeting scheduling flow:
-User: "I'd like to schedule a meeting"
-You: "I'd be happy to help you schedule a consultation! Could I get your name and email address?"
-User: "John Smith, john@example.com"
-You: "Thanks John! When would work best for you? We have availability this week and next."
-User: "How about Thursday at 2pm?"
-You: "MEETING_REQUEST: John Smith | john@example.com | Thursday at 2pm | General consultation"
-"Great choice! I've submitted your meeting request for Thursday at 2pm. Our team will confirm this time slot with you via email shortly. Is there anything specific you'd like to discuss in the meeting?"
-"""
-
-@api_router.post("/chat/message", response_model=ChatResponse)
-async def chat_message(request: ChatRequest):
-    """Handle chatbot messages"""
-    try:
-        emergent_key = os.environ.get('EMERGENT_LLM_KEY')
-        if not emergent_key:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Chatbot is not configured"
-            )
-        
-        # Get or create session
-        session_id = request.session_id
-        session = None
-        
-        if session_id:
-            session_doc = await db.chat_sessions.find_one({"id": session_id})
-            if session_doc:
-                session = ChatSession(**session_doc)
-        
-        if not session:
-            session = ChatSession()
-            session_id = session.id
-        
-        # Create chat instance with Claude model
-        chat = LlmChat(
-            api_key=emergent_key,
-            session_id=session_id,
-            system_message=CHATBOT_SYSTEM_PROMPT
-        ).with_model("anthropic", "claude-sonnet-4-20250514")
-        
-        # Add previous messages to conversation for context
-        for msg in session.messages:
-            chat.messages.append({
-                "role": msg.role,
-                "content": msg.content
-            })
-        
-        # Create user message and get AI response
-        user_msg = UserMessage(text=request.message)
-        ai_response = await chat.send_message(user_msg)
-        
-        # Add messages to session
-        user_message = ChatMessage(role="user", content=request.message)
-        assistant_message = ChatMessage(role="assistant", content=ai_response)
-        session.messages.append(user_message)
-        session.messages.append(assistant_message)
-        session.updated_at = datetime.utcnow()
-        
-        # Check for lead capture patterns in user message
-        user_text_lower = request.message.lower()
-        
-        # Simple lead extraction (can be enhanced later)
-        import re
-        email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
-        phone_pattern = r'[\+]?[(]?[0-9]{1,3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}'
-        
-        emails = re.findall(email_pattern, request.message)
-        phones = re.findall(phone_pattern, request.message)
-        
-        if emails:
-            session.lead_email = emails[0]
-            session.lead_captured = True
-        if phones:
-            session.lead_phone = phones[0]
-            session.lead_captured = True
-        
-        # Check if name-like pattern (simple heuristic)
-        if any(phrase in user_text_lower for phrase in ['my name is', "i'm ", "i am ", "call me "]):
-            # Extract potential name
-            for phrase in ['my name is ', "i'm ", "i am ", "call me "]:
-                if phrase in user_text_lower:
-                    idx = user_text_lower.find(phrase) + len(phrase)
-                    potential_name = request.message[idx:].split()[0:2]
-                    if potential_name:
-                        session.lead_name = ' '.join(potential_name).strip('.,!?')
-                        break
-        
-        # Check for meeting request in AI response
-        meeting_request_pattern = r'MEETING_REQUEST:\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^\n"]+)'
-        meeting_match = re.search(meeting_request_pattern, ai_response)
-        
-        if meeting_match:
-            meeting_name = meeting_match.group(1).strip()
-            meeting_email = meeting_match.group(2).strip()
-            meeting_datetime = meeting_match.group(3).strip()
-            meeting_topic = meeting_match.group(4).strip()
-            
-            # Save meeting request to database
-            meeting_request_data = {
-                "id": str(uuid.uuid4()),
-                "session_id": session_id,
-                "name": meeting_name,
-                "email": meeting_email,
-                "phone": session.lead_phone,
-                "preferred_datetime": meeting_datetime,
-                "topic": meeting_topic,
-                "status": "pending",
-                "created_at": datetime.utcnow()
-            }
-            await db.meeting_requests.insert_one(meeting_request_data)
-            
-            # Update session with lead info
-            session.lead_name = meeting_name
-            session.lead_email = meeting_email
-            session.lead_captured = True
-            
-            # Send email to admin
-            try:
-                await send_meeting_request_email(
-                    name=meeting_name,
-                    email=meeting_email,
-                    phone=session.lead_phone or "",
-                    preferred_datetime=meeting_datetime,
-                    topic=meeting_topic
-                )
-                logger.info(f"✅ Meeting request email sent for: {meeting_email}")
-            except Exception as email_error:
-                logger.error(f"❌ Failed to send meeting request email: {str(email_error)}")
-            
-            # Clean up the AI response by removing the MEETING_REQUEST line
-            ai_response = re.sub(meeting_request_pattern, '', ai_response).strip()
-            ai_response = re.sub(r'^\s*\n', '', ai_response)  # Remove leading empty lines
-            assistant_message = ChatMessage(role="assistant", content=ai_response)
-            session.messages[-1] = assistant_message
-        
-        # Save session to database
-        session_dict = session.dict()
-        session_dict['messages'] = [m.dict() for m in session.messages]
-        
-        await db.chat_sessions.update_one(
-            {"id": session_id},
-            {"$set": session_dict},
-            upsert=True
-        )
-        
-        logger.info(f"✅ Chat message processed for session: {session_id}")
-        
-        return ChatResponse(
-            session_id=session_id,
-            message=ai_response,
-            lead_captured=session.lead_captured
-        )
-        
-    except Exception as e:
-        logger.error(f"❌ Chat error: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Chat service error: {str(e)}"
-        )
-
-@api_router.get("/admin/chat-sessions")
-async def get_chat_sessions(current_user: dict = Depends(get_current_user)):
-    """Get all chat sessions with leads (admin only)"""
-    sessions = await db.chat_sessions.find().sort("updated_at", -1).to_list(1000)
-    
-    # Convert to safe format (exclude _id)
-    result = []
-    for session in sessions:
-        session_data = {
-            "id": session.get("id"),
-            "lead_captured": session.get("lead_captured", False),
-            "lead_name": session.get("lead_name"),
-            "lead_email": session.get("lead_email"),
-            "lead_phone": session.get("lead_phone"),
-            "lead_interest": session.get("lead_interest"),
-            "message_count": len(session.get("messages", [])),
-            "created_at": session.get("created_at"),
-            "updated_at": session.get("updated_at")
-        }
-        result.append(session_data)
-    
-    return result
-
-@api_router.get("/admin/chat-sessions/{session_id}")
-async def get_chat_session(
-    session_id: str,
-    current_user: dict = Depends(get_current_user)
-):
-    """Get a specific chat session with full conversation (admin only)"""
-    session = await db.chat_sessions.find_one({"id": session_id})
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    # Remove MongoDB _id field
-    session_data = {k: v for k, v in session.items() if k != '_id'}
-    return session_data
-
-@api_router.delete("/admin/chat-sessions/{session_id}")
-async def delete_chat_session(
-    session_id: str,
-    current_user: dict = Depends(get_current_user)
-):
-    """Delete a chat session (admin only)"""
-    result = await db.chat_sessions.delete_one({"id": session_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    logger.info(f"✅ Chat session deleted: {session_id}")
-    return {"message": "Chat session deleted successfully"}
-
-# ==================== MEETING REQUEST ENDPOINTS ====================
-
-@api_router.get("/admin/meeting-requests")
-async def get_meeting_requests(current_user: dict = Depends(get_current_user)):
-    """Get all meeting requests (admin only)"""
-    requests = await db.meeting_requests.find().sort("created_at", -1).to_list(1000)
-    
-    result = []
-    for req in requests:
-        request_data = {
-            "id": req.get("id"),
-            "session_id": req.get("session_id"),
-            "name": req.get("name"),
-            "email": req.get("email"),
-            "phone": req.get("phone"),
-            "preferred_datetime": req.get("preferred_datetime"),
-            "topic": req.get("topic"),
-            "status": req.get("status", "pending"),
-            "created_at": req.get("created_at"),
-            "admin_notes": req.get("admin_notes")
-        }
-        result.append(request_data)
-    
-    return result
-
-@api_router.put("/admin/meeting-requests/{request_id}/status")
-async def update_meeting_request_status(
-    request_id: str,
-    status_update: dict,
-    current_user: dict = Depends(get_current_user)
-):
-    """Update meeting request status (admin only)"""
-    new_status = status_update.get("status")
-    admin_notes = status_update.get("admin_notes", "")
-    
-    if new_status not in ["pending", "approved", "rejected"]:
-        raise HTTPException(status_code=400, detail="Invalid status")
-    
-    result = await db.meeting_requests.update_one(
-        {"id": request_id},
-        {"$set": {"status": new_status, "admin_notes": admin_notes}}
-    )
-    
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Meeting request not found")
-    
-    logger.info(f"✅ Meeting request {request_id} updated to {new_status}")
-    return {"message": f"Meeting request {new_status} successfully"}
-
-@api_router.delete("/admin/meeting-requests/{request_id}")
-async def delete_meeting_request(
-    request_id: str,
-    current_user: dict = Depends(get_current_user)
-):
-    """Delete a meeting request (admin only)"""
-    result = await db.meeting_requests.delete_one({"id": request_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Meeting request not found")
-    
-    logger.info(f"✅ Meeting request deleted: {request_id}")
-    return {"message": "Meeting request deleted successfully"}
-
-# Include the router in the main app
-app.include_router(api_router)
 
 if __name__ == "__main__":
     import uvicorn
