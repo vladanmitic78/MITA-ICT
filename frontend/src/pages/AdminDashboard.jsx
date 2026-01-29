@@ -291,6 +291,10 @@ const AdminDashboard = () => {
       }}>
         <h1 className="display-large">Admin Dashboard</h1>
         <div style={{ display: 'flex', gap: '12px' }}>
+          <Button onClick={() => navigate('/admin/social-media')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Share2 size={20} />
+            Social Media
+          </Button>
           <Button onClick={() => navigate('/admin/settings')} className="btn-secondary">
             <Settings size={20} />
             Settings
