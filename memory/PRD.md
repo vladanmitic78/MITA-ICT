@@ -58,6 +58,8 @@ Build a full-stack consulting website for "MITA ICT" with a dark-themed, convers
 - [x] Admin panel view of all conversations
 - [x] View full conversation details
 - [x] Delete chat sessions
+- [x] **Meeting scheduling** - Collects user's preferred time, sends email to admin for approval
+- [x] **Meeting Requests tab** in admin panel with approve/reject/email actions
 
 ### Security & Compliance
 - [x] GDPR-compliant cookie consent banner
