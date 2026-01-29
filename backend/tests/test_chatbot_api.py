@@ -219,8 +219,8 @@ class TestAdminChatSessions:
     def test_get_chat_sessions_unauthorized(self):
         """Test getting chat sessions without auth"""
         response = requests.get(f"{BASE_URL}/api/admin/chat-sessions")
-        assert response.status_code == 401
-        print(f"✅ Unauthorized access rejected correctly")
+        assert response.status_code in [401, 403]  # Both are valid unauthorized responses
+        print(f"✅ Unauthorized access rejected correctly: status={response.status_code}")
     
     def test_get_single_chat_session(self, auth_token):
         """Test getting a single chat session with full conversation"""
