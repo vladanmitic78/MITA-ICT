@@ -66,18 +66,20 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [servicesRes, productsRes, contactsRes, aboutRes, chatSessionsRes] = await Promise.all([
+      const [servicesRes, productsRes, contactsRes, aboutRes, chatSessionsRes, meetingRequestsRes] = await Promise.all([
         publicAPI.getServices(),
         publicAPI.getSaasProducts(),
         adminAPI.getContacts(),
         publicAPI.getAboutContent(),
-        adminAPI.getChatSessions().catch(() => ({ data: [] }))
+        adminAPI.getChatSessions().catch(() => ({ data: [] })),
+        adminAPI.getMeetingRequests().catch(() => ({ data: [] }))
       ]);
       setServices(servicesRes.data || []);
       setSaasProducts(productsRes.data || []);
       setContacts(contactsRes.data || []);
       setAboutContent(aboutRes.data || null);
       setChatSessions(chatSessionsRes.data || []);
+      setMeetingRequests(meetingRequestsRes.data || []);
     } catch (error) {
       console.error('Error loading data:', error);
       if (error.response?.status === 401) {
@@ -92,6 +94,7 @@ const AdminDashboard = () => {
         setContacts([]);
         setAboutContent(null);
         setChatSessions([]);
+        setMeetingRequests([]);
       }
     } finally {
       setLoading(false);
