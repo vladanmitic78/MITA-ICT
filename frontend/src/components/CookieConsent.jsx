@@ -180,7 +180,7 @@ const CookieConsent = () => {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 className="heading-1">Cookie-inställningar</h2>
+              <h2 className="heading-1">Cookie Settings</h2>
               <button
                 onClick={() => setShowSettings(false)}
                 style={{
@@ -197,19 +197,19 @@ const CookieConsent = () => {
             {/* Necessary Cookies */}
             <div style={{ marginBottom: '24px', padding: '16px', background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <h3 className="heading-2">Nödvändiga cookies</h3>
-                <span className="body-small" style={{ color: 'var(--brand-primary)' }}>Alltid aktiv</span>
+                <h3 className="heading-2">Necessary Cookies</h3>
+                <span className="body-small" style={{ color: 'var(--brand-primary)' }}>Always Active</span>
               </div>
               <p className="body-small" style={{ color: 'var(--text-muted)' }}>
-                Dessa cookies är nödvändiga för att webbplatsen ska fungera och kan inte inaktiveras. 
-                De används för grundläggande funktioner som autentisering och säkerhet.
+                These cookies are essential for the website to function and cannot be disabled. 
+                They are used for basic functions like authentication and security.
               </p>
             </div>
 
             {/* Analytics Cookies */}
             <div style={{ marginBottom: '24px', padding: '16px', background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <h3 className="heading-2">Analytiska cookies</h3>
+                <h3 className="heading-2">Analytics Cookies</h3>
                 <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
@@ -220,14 +220,14 @@ const CookieConsent = () => {
                 </label>
               </div>
               <p className="body-small" style={{ color: 'var(--text-muted)' }}>
-                Hjälper oss förstå hur besökare använder webbplatsen för att förbättra användarupplevelsen.
+                Help us understand how visitors use the website to improve user experience.
               </p>
             </div>
 
             {/* Marketing Cookies */}
             <div style={{ marginBottom: '24px', padding: '16px', background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <h3 className="heading-2">Marknadsförings-cookies</h3>
+                <h3 className="heading-2">Marketing Cookies</h3>
                 <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
@@ -238,8 +238,8 @@ const CookieConsent = () => {
                 </label>
               </div>
               <p className="body-small" style={{ color: 'var(--text-muted)' }}>
-                Används för att spåra besökare över webbplatser för marknadsföringsändamål på sociala medier 
-                (Facebook, Instagram, TikTok, LinkedIn, YouTube). Data kan delas med tredje part.
+                Used to track visitors across websites for marketing purposes on social media 
+                (Facebook, Instagram, TikTok, LinkedIn, YouTube). Data may be shared with third parties.
               </p>
             </div>
 
@@ -249,19 +249,19 @@ const CookieConsent = () => {
                 className="btn-primary"
                 style={{ flex: 1 }}
               >
-                Spara inställningar
+                Save Preferences
               </Button>
               <Button
                 onClick={handleAcceptAll}
                 className="btn-secondary"
                 style={{ flex: 1 }}
               >
-                Acceptera alla
+                Accept All
               </Button>
             </div>
 
             <p className="body-small" style={{ marginTop: '16px', color: 'var(--text-muted)', textAlign: 'center' }}>
-              Läs mer i vår <a href="/privacy" style={{ color: 'var(--brand-primary)', textDecoration: 'underline' }}>Integritetspolicy</a>
+              Read more in our <a href="/privacy" style={{ color: 'var(--brand-primary)', textDecoration: 'underline' }}>Privacy Policy</a>
             </p>
           </div>
         </div>
