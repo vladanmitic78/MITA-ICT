@@ -28,7 +28,8 @@ from models import (
     Contact, ContactCreate, ContactUpdate,
     AboutContent, AboutContentUpdate,
     AdminLogin, Token, Admin, ChangePassword,
-    SocialIntegrations
+    SocialIntegrations,
+    ChatMessage, ChatSession, ChatRequest, ChatResponse
 )
 from auth import (
     verify_password, get_password_hash, create_access_token, 
