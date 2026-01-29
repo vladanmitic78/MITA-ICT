@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import List
 import httpx
 import io
+import uuid
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
 from reportlab.lib.units import inch
