@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Cookie, Settings } from 'lucide-react';
 import { Button } from './ui/button';
 
-const CookieConsent = () => {
+const CookieConsent = ({ onAccept }) => {
   const [showBanner, setShowBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [preferences, setPreferences] = useState({
@@ -23,11 +23,13 @@ const CookieConsent = () => {
         const saved = JSON.parse(consent);
         setPreferences(saved);
         initializeServices(saved);
+        // Signal that cookies were already accepted
+        if (onAccept) onAccept();
       } catch (e) {
         console.error('Error loading cookie preferences:', e);
       }
     }
-  }, []);
+  }, [onAccept]);
 
   const initializeServices = (prefs) => {
     // Initialize analytics if accepted
