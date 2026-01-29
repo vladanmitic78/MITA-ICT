@@ -98,7 +98,11 @@ export const adminAPI = {
   deleteSaasProduct: (id) => apiClient.delete(`/admin/saas-products/${id}`),
   
   // About Content
-  updateAboutContent: (data) => apiClient.put('/admin/about', data)
+  updateAboutContent: (data) => apiClient.put('/admin/about', data),
+  
+  // Social Media Integrations
+  getSocialIntegrations: () => apiClient.get('/admin/social-integrations'),
+  updateSocialIntegrations: (data) => apiClient.put('/admin/social-integrations', data)
 };
 
 export default apiClient;
