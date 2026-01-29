@@ -838,10 +838,10 @@ async def chat_message(request: ChatRequest):
         
         # Add previous messages to conversation for context
         for msg in session.messages:
-            if msg.role == "user":
-                chat.add_user_message(msg.content)
-            elif msg.role == "assistant":
-                chat.add_assistant_message(msg.content)
+            chat.messages.append({
+                "role": msg.role,
+                "content": msg.content
+            })
         
         # Create user message and get AI response
         user_msg = UserMessage(text=request.message)
