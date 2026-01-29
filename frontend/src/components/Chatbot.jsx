@@ -76,6 +76,36 @@ const Chatbot = () => {
 
   return (
     <>
+      {/* Welcome Message Bubble */}
+      {!isOpen && (
+        <div
+          onClick={() => setIsOpen(true)}
+          style={{
+            position: 'fixed',
+            bottom: '94px',
+            right: '24px',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '12px 12px 4px 12px',
+            padding: '12px 16px',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+            zIndex: 999,
+            cursor: 'pointer',
+            maxWidth: '200px',
+            animation: 'fadeInUp 0.5s ease-out'
+          }}
+        >
+          <p style={{ 
+            margin: 0, 
+            fontSize: '14px', 
+            color: 'var(--text-primary)',
+            lineHeight: '1.4'
+          }}>
+            Need help? <span style={{ color: 'var(--accent-cyan)' }}>Chat with us!</span>
+          </p>
+        </div>
+      )}
+
       {/* Chat Toggle Button */}
       <button
         data-testid="chatbot-toggle-btn"
