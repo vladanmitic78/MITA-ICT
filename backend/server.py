@@ -685,6 +685,47 @@ async def export_contacts_excel(current_user: dict = Depends(get_current_user)):
             created_at = contact.get('created_at', datetime.utcnow())
             if isinstance(created_at, str):
                 created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+
+
+# Social Media Integrations Endpoints
+@api_router.get("/admin/social-integrations", response_model=SocialIntegrations)
+async def get_social_integrations(current_user: dict = Depends(get_current_user)):
+    """Get social media integrations (admin only)"""
+    integration = await db.social_integrations.find_one()
+    if not integration:
+        # Create default integration
+        default_integration = SocialIntegrations().dict()
+        await db.social_integrations.insert_one(default_integration)
+        logger.info("✅ Default social integrations created")
+        return SocialIntegrations(**default_integration)
+    
+    return SocialIntegrations(**integration)
+
+@api_router.put("/admin/social-integrations", response_model=SocialIntegrations)
+async def update_social_integrations(
+    integrations: SocialIntegrations,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update social media integrations (admin only)"""
+    existing = await db.social_integrations.find_one()
+    
+    integration_dict = integrations.dict()
+    integration_dict['updated_at'] = datetime.utcnow()
+    
+    if existing:
+        # Update existing
+        integration_dict['id'] = existing['id']
+        await db.social_integrations.update_one(
+            {"id": existing['id']},
+            {"$set": integration_dict}
+        )
+    else:
+        # Create new
+        await db.social_integrations.insert_one(integration_dict)
+    
+    logger.info("✅ Social media integrations updated")
+    return SocialIntegrations(**integration_dict)
+
             
             ws.append([
                 contact.get('name', 'N/A'),
