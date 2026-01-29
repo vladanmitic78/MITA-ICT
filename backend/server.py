@@ -66,6 +66,9 @@ async def startup_db_client():
         # Initialize admin user if not exists
         await init_admin_user(db)
         
+        # Create database indexes for performance
+        await create_indexes()
+        
         # Seed default data if collections are empty
         await seed_default_data()
         
@@ -74,6 +77,39 @@ async def startup_db_client():
     except Exception as e:
         logger.error(f"❌ Database connection failed: {str(e)}")
         raise
+
+
+async def create_indexes():
+    """Create database indexes for better query performance"""
+    global db
+    
+    try:
+        # Contacts indexes
+        await db.contacts.create_index([("created_at", -1)])
+        await db.contacts.create_index([("email", 1)])
+        await db.contacts.create_index([("name", "text"), ("email", "text"), ("service", "text")])
+        
+        # Chat sessions indexes
+        await db.chat_sessions.create_index([("updated_at", -1)])
+        await db.chat_sessions.create_index([("lead_captured", 1)])
+        await db.chat_sessions.create_index([("id", 1)], unique=True)
+        
+        # Meeting requests indexes
+        await db.meeting_requests.create_index([("created_at", -1)])
+        await db.meeting_requests.create_index([("status", 1)])
+        await db.meeting_requests.create_index([("id", 1)], unique=True)
+        
+        # Services and products indexes
+        await db.services.create_index([("id", 1)], unique=True)
+        await db.saas_products.create_index([("id", 1)], unique=True)
+        
+        # Admin users index
+        await db.admins.create_index([("username", 1)], unique=True)
+        
+        logger.info("✅ Database indexes created successfully")
+        
+    except Exception as e:
+        logger.warning(f"⚠️ Index creation warning: {str(e)}")
 
 
 @app.on_event("shutdown")
