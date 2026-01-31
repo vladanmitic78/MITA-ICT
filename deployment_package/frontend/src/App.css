@@ -1,0 +1,179 @@
+:root {
+  /* Backgrounds - Dark Theme Foundation */
+  --bg-primary: #000000;
+  --bg-secondary: #121212;
+  --bg-overlay: rgba(255, 255, 255, 0.1);
+  
+  /* Text - High Contrast for Dark Theme */
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.85);
+  --text-muted: #4D4D4D;
+  
+  /* Borders - Subtle Dark Theme */
+  --border-subtle: rgba(255, 255, 255, 0.25);
+  --border-medium: rgba(255, 255, 255, 0.4);
+  
+  /* MAIN ACCENT COLORS - Brand Colors Only */
+  --brand-primary: #00FFD1;
+  --brand-hover: rgba(0, 255, 209, 0.1);
+  --brand-active: #6FD2C0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.btn-primary {
+  background: var(--brand-primary);
+  color: #000000;
+  border: none;
+  border-radius: 0px;
+  padding: 14px 24px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.4s ease-in-out;
+  min-height: 56px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.btn-primary:hover {
+  background: var(--brand-hover);
+  color: var(--brand-primary);
+  transform: scale(1.02);
+}
+
+.btn-primary:active {
+  background: var(--brand-active);
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 0px;
+  padding: 14px 24px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.4s ease-in-out;
+  min-height: 56px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.btn-secondary:hover {
+  background: #FFFFFF;
+  color: #000000;
+}
+
+.btn-secondary:active {
+  background: #F0F0F0;
+  transform: scale(0.98);
+}
+
+.dark-transition {
+  transition: all 0.4s ease-in-out;
+}
+
+.dark-hover:hover {
+  transform: translateY(-2px);
+}
+
+.display-huge {
+  font-size: 66px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.62px;
+  color: var(--text-primary);
+}
+
+.display-large {
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.heading-1 {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.heading-2 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+.body-large {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.body-medium {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.body-muted {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .display-huge {
+    font-size: 42px;
+  }
+  
+  .display-large {
+    font-size: 36px;
+  }
+  
+  .heading-1 {
+    font-size: 24px;
+  }
+}
+/* Chatbot welcome animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
