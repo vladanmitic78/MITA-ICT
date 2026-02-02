@@ -57,3 +57,7 @@ ssl/
 
 # Deployment artifacts
 deployment_package/
+-e 
+# Environment files
+*.env
+*.env.*
