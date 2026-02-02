@@ -1,110 +1,165 @@
-# MITA ICT Consulting Website - Product Requirements Document
+# MITA ICT - Product Requirements Document
 
-## Original Problem Statement
-Build a full-stack consulting website for "MITA ICT" with a dark-themed, conversion-optimized design featuring:
-- 4 primary pages: Home, SaaS Store, About Us, Contact Us
-- Secure admin panel for full content management
-- reCAPTCHA on the contact form with email notifications
-- CRUD operations for services and SaaS products
-- GDPR-compliant cookie consent banner (Swedish law)
-- Social media marketing integrations
-- AI-powered chatbot for sales and lead generation
+## Project Overview
+Full-stack consulting website for MITA ICT with AI chatbot, admin panel, and SEO optimization.
+
+**Live URL**: https://mitaict.com  
+**Admin Panel**: https://mitaict.com/admin  
+**GitHub**: https://github.com/vladanmitic78/MITA-ICT
+
+---
+
+## What's Been Implemented ✅
+
+### Core Website (Completed)
+- [x] Dark-themed, conversion-optimized design
+- [x] Home page with services overview
+- [x] SaaS Store page with products
+- [x] About Us page
+- [x] Contact Us page with form
+- [x] Cookie consent banner
+- [x] Responsive design for all devices
+
+### Admin Panel (Completed)
+- [x] Secure JWT authentication
+- [x] Services management (CRUD)
+- [x] SaaS Products management (CRUD)
+- [x] About Us content editor
+- [x] Contact submissions viewer
+- [x] Chat leads viewer
+- [x] Meeting requests management (approve/reject)
+- [x] Social media integrations settings
+
+### AI Chatbot (Completed)
+- [x] Claude Sonnet 4 integration via Emergent LLM
+- [x] Lead capture (name, email, phone)
+- [x] Meeting scheduling within chat
+- [x] Email notifications to admin for meeting requests
+- [x] Session persistence
+
+### SEO Optimization (Completed)
+- [x] Meta tags optimization
+- [x] Keyword integration throughout pages
+- [x] sitemap.xml
+- [x] robots.txt
+- [x] JSON-LD structured data
+
+### Database (Completed)
+- [x] MongoDB with indexes for performance
+- [x] Pagination for admin lists
+- [x] Collections: services, saas_products, about_content, contacts, chat_sessions, meeting_requests, admins, social_integrations
+
+### Deployment (Completed)
+- [x] Docker + Docker Compose configuration
+- [x] SSL with Let's Encrypt
+- [x] Nginx reverse proxy
+- [x] Production deployment on Hetzner VPS
+- [x] Easy deployment script (deploy.sh)
+- [x] Database migration completed
+
+---
 
 ## Tech Stack
-- **Frontend**: React, Tailwind CSS, Shadcn/UI
-- **Backend**: FastAPI, Python (modular router architecture)
-- **Database**: MongoDB
-- **AI Integration**: Claude Sonnet 4 via Emergent Universal Key (emergentintegrations library)
 
-## Backend Architecture (Refactored)
-```
-/app/backend/
-├── server.py          # Main app entry point
-├── routes/
-│   ├── __init__.py    # Router exports
-│   ├── public.py      # Public API (services, products, about)
-│   ├── contacts.py    # Contact form submission
-│   ├── auth.py        # Admin authentication
-│   ├── admin.py       # Admin CRUD operations
-│   └── chat.py        # Chatbot & meeting requests
-├── models.py          # Pydantic models
-├── auth.py            # JWT authentication
-└── email_service.py   # Email notifications
-```
+| Layer | Technology |
+|-------|------------|
+| Frontend | React, Tailwind CSS, Shadcn UI |
+| Backend | FastAPI, Python 3.11 |
+| Database | MongoDB 6.0 |
+| AI | Claude Sonnet 4 (via Emergent) |
+| Deployment | Docker, Nginx, Let's Encrypt |
+| Hosting | Hetzner VPS |
 
-## Implemented Features
-
-### Core Pages
-- [x] Home page with hero section, services overview, and CTAs
-- [x] SaaS Store page listing products with descriptions
-- [x] About Us page with company story and expertise sections
-- [x] Contact Us page with reCAPTCHA-protected form
-
-### Admin Dashboard (/admin/dashboard)
-- [x] Admin login with JWT authentication
-- [x] Services management (CRUD)
-- [x] SaaS products management (CRUD)
-- [x] About content editing with expertise sections
-- [x] Contact submissions management with search, edit, delete
-- [x] PDF and Excel export for contacts
-- [x] Social media integrations management
-- [x] **Chat Leads tab** - View chatbot conversations and captured leads
-
-### AI Chatbot
-- [x] Chat bubble appears after cookie consent
-- [x] Multi-turn conversations with context
-- [x] Lead capture (email, phone, name extraction)
-- [x] Claude Sonnet 4 integration for intelligent responses
-- [x] Admin panel view of all conversations
-- [x] View full conversation details
-- [x] Delete chat sessions
-- [x] **Meeting scheduling** - Collects user's preferred time, sends email to admin for approval
-- [x] **Meeting Requests tab** in admin panel with approve/reject/email actions
-
-### Security & Compliance
-- [x] GDPR-compliant cookie consent banner
-- [x] reCAPTCHA verification on contact form
-- [x] JWT-based admin authentication
-- [x] Password hashing with bcrypt
-
-### SEO & Performance
-- [x] Code splitting and lazy loading
-- [x] Meta tags optimization
-- [x] robots.txt and sitemap.xml
-- [x] Accessibility improvements (skip links, ARIA labels)
+---
 
 ## Admin Credentials
-- **Username**: vladanmitic@gmail.com
+
+- **Email**: vladanmitic@gmail.com
 - **Password**: Admin123!
 
-## Key API Endpoints
-- `POST /api/chat/message` - Chatbot message handling
-- `GET /api/admin/chat-sessions` - List all chat sessions
-- `GET /api/admin/chat-sessions/{id}` - Get session details
-- `DELETE /api/admin/chat-sessions/{id}` - Delete session
-- `POST /api/auth/login` - Admin login
-- `GET/POST/PUT/DELETE /api/admin/*` - Admin CRUD operations
+---
 
-## Database Collections
-- `services` - Consulting services
-- `saas_products` - SaaS product listings
-- `about_content` - About page content
-- `contacts` - Contact form submissions
-- `admins` - Admin user accounts
-- `chat_sessions` - Chatbot conversations and leads
-- `social_integrations` - Social media API keys
+## Environment Variables
 
-## Upcoming/Future Tasks (Backlog)
-- None - all priority tasks completed!
+See `.env.example` for all required variables:
+- SMTP settings (SiteGround)
+- Emergent LLM Key (for chatbot)
+- reCAPTCHA keys
+- JWT secret
 
-## Completed in Latest Session
-- **SEO Optimization**: Comprehensive keywords, structured data (JSON-LD), meta tags
-- **Database Pagination**: Contacts endpoint now supports pagination with search
-- **Database Indexes**: Created indexes for all frequently queried fields
-- **Health Check Endpoint**: `/api/health` for deployment monitoring
-- **Hetzner Deployment Ready**: Docker, docker-compose, nginx configs created
+---
 
-## Notes
-- Chatbot uses Emergent Universal Key (no user-provided API key needed)
-- Cookie consent required before chatbot appears (GDPR compliance)
-- Lead extraction is automated from conversation content
+## Future Enhancements (Backlog)
+
+### P1 - Next Priority
+- [ ] AI Voice Agent for phone calls (Google AI Studio, ElevenLabs, or Bland.ai)
+
+### P2 - Nice to Have
+- [ ] Email confirmation to users when meeting is approved (with .ics calendar invite)
+- [ ] Refactor AdminDashboard.jsx into smaller components
+- [ ] Analytics dashboard for admin
+- [ ] Multi-language support
+
+---
+
+## Deployment Commands
+
+```bash
+# First-time setup
+./deploy.sh first-time
+
+# Update after code changes
+./deploy.sh update
+
+# Renew SSL (every 90 days)
+./deploy.sh ssl
+
+# Backup database
+./deploy.sh backup-db
+
+# Check status
+./deploy.sh status
+```
+
+---
+
+## File Structure
+
+```
+MITA-ICT/
+├── deploy.sh              # Easy deployment script
+├── docker-compose.yml     # Docker configuration
+├── .env.example           # Environment template
+├── DEPLOYMENT.md          # Deployment guide
+├── backend/
+│   ├── Dockerfile
+│   ├── server.py
+│   ├── models.py
+│   ├── auth.py
+│   ├── email_service.py
+│   └── routes/
+│       ├── admin.py
+│       ├── auth.py
+│       ├── chat.py
+│       ├── contacts.py
+│       └── public.py
+└── frontend/
+    ├── Dockerfile
+    ├── nginx-ssl.conf
+    └── src/
+        ├── App.js
+        ├── api.js
+        ├── components/
+        │   └── Chatbot.jsx
+        └── pages/
+            ├── Home.jsx
+            ├── SaasStore.jsx
+            ├── AboutUs.jsx
+            ├── ContactUs.jsx
+            └── AdminDashboard.jsx
+```
+
+---
+
+## Last Updated
+February 2, 2026 - Production deployment completed
