@@ -1,201 +1,141 @@
-# MITA ICT Website - Hetzner VPS Deployment Guide
+# MITA ICT - Hetzner Deployment Guide
 
-## Prerequisites
+## Quick Start (3 Steps)
 
-- Hetzner VPS with Ubuntu 22.04 LTS
-- Domain name pointed to your VPS IP (mitaict.com)
-- SSH access to the server
+### Step 1: Prepare your Hetzner VPS
 
-## 1. Server Setup
+SSH into your server and install Docker:
 
-### Connect to your VPS
 ```bash
-ssh root@your-server-ip
-```
-
-### Update system and install Docker
-```bash
-apt update && apt upgrade -y
-apt install -y curl git
+ssh root@YOUR_SERVER_IP
 
 # Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-
-# Install Docker Compose
-curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-
-# Start Docker service
-systemctl enable docker
-systemctl start docker
+curl -fsSL https://get.docker.com | sh
+apt install -y docker-compose
 ```
 
-## 2. Clone Repository
+### Step 2: Clone and Configure
 
 ```bash
-cd /opt
-git clone https://github.com/your-repo/mita-ict.git
-cd mita-ict
-```
+cd /root
+git clone https://github.com/vladanmitic78/MITA-ICT.git
+cd MITA-ICT
 
-## 3. Configure Environment Variables
-
-### Create production .env file
-```bash
+# Copy and edit environment file
 cp .env.example .env
 nano .env
 ```
 
-### Required environment variables:
-```env
-# MongoDB
-MONGO_ROOT_USER=admin
-MONGO_ROOT_PASSWORD=your-secure-password-here
+Fill in your `.env` values:
+- `SMTP_PASSWORD` - Your SiteGround email password
+- `EMERGENT_LLM_KEY` - Your Emergent API key for chatbot
+- `RECAPTCHA_SECRET_KEY` - Google reCAPTCHA secret key
+- `REACT_APP_RECAPTCHA_SITE_KEY` - Google reCAPTCHA site key
 
-# Application
-SECRET_KEY=your-super-secret-jwt-key-min-32-chars
-EMERGENT_LLM_KEY=your-emergent-key
-
-# Email (SMTP)
-SMTP_HOST=smtp.your-provider.com
-SMTP_PORT=465
-SMTP_USERNAME=your-email@domain.com
-SMTP_PASSWORD=your-smtp-password
-SMTP_FROM_EMAIL=noreply@mitaict.com
-SMTP_TO_EMAIL=info@mitaict.com
-
-# reCAPTCHA
-RECAPTCHA_SECRET_KEY=your-recaptcha-secret
-REACT_APP_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
-
-# Frontend URL
-REACT_APP_BACKEND_URL=https://mitaict.com
-```
-
-## 4. SSL Certificate Setup (Let's Encrypt)
-
-### Initial certificate request
-```bash
-# Create directories
-mkdir -p certbot/conf certbot/www
-
-# Get initial certificate (run without nginx first)
-docker run -it --rm \
-  -v $(pwd)/certbot/conf:/etc/letsencrypt \
-  -v $(pwd)/certbot/www:/var/www/certbot \
-  -p 80:80 \
-  certbot/certbot certonly --standalone \
-  -d mitaict.com -d www.mitaict.com \
-  --email your-email@domain.com \
-  --agree-tos --no-eff-email
-```
-
-## 5. Deploy Application
-
-### Build and start services
-```bash
-docker-compose up -d --build
-```
-
-### Check service status
-```bash
-docker-compose ps
-docker-compose logs -f
-```
-
-### Verify health
-```bash
-curl https://mitaict.com/api/health
-```
-
-## 6. Firewall Configuration
+### Step 3: Deploy
 
 ```bash
-# Install UFW
-apt install ufw -y
-
-# Allow SSH, HTTP, HTTPS
-ufw allow 22/tcp
-ufw allow 80/tcp
-ufw allow 443/tcp
-
-# Enable firewall
-ufw enable
+chmod +x deploy.sh
+./deploy.sh first-time
 ```
 
-## 7. Monitoring & Maintenance
+That's it! Your website will be live at https://mitaict.com
+
+---
+
+## Other Commands
+
+### Update after code changes
+```bash
+cd /root/MITA-ICT
+git pull
+./deploy.sh update
+```
+
+### Renew SSL certificate (every 90 days)
+```bash
+./deploy.sh ssl
+```
 
 ### View logs
 ```bash
-docker-compose logs -f backend
-docker-compose logs -f frontend
-docker-compose logs -f nginx
+./deploy.sh logs
 ```
 
-### Restart services
+### Check status
 ```bash
-docker-compose restart
+./deploy.sh status
 ```
 
-### Update application
+### Backup database
 ```bash
-git pull
-docker-compose up -d --build
+./deploy.sh backup-db
 ```
 
-### Backup MongoDB
+### Restore database
 ```bash
-docker exec mita-mongodb mongodump --out /backup
-docker cp mita-mongodb:/backup ./backup-$(date +%Y%m%d)
+./deploy.sh restore-db backup_20260202.tar.gz
 ```
 
-## 8. Performance Optimization Checklist
+---
 
-- [x] Gzip compression enabled (nginx)
-- [x] Static file caching (1 year)
-- [x] HTTP/2 enabled
-- [x] Database indexes created
-- [x] Connection pooling
-- [x] Rate limiting for API endpoints
-- [x] HSTS headers
-- [x] Security headers
+## DNS Setup
 
-## 9. SEO Verification
+Point your domain to your Hetzner server:
 
-After deployment, verify:
-1. `https://mitaict.com/robots.txt` is accessible
-2. `https://mitaict.com/sitemap.xml` is accessible
-3. Submit sitemap to Google Search Console
-4. Submit sitemap to Bing Webmaster Tools
+| Type | Name | Value |
+|------|------|-------|
+| A | @ | YOUR_SERVER_IP |
+| A | www | YOUR_SERVER_IP |
 
-## 10. Troubleshooting
+Keep MX records pointing to your email provider (SiteGround).
 
-### Check container logs
+---
+
+## Troubleshooting
+
+### Check container status
 ```bash
+docker ps
 docker logs mita-backend
 docker logs mita-frontend
-docker logs mita-nginx
 ```
 
-### Restart specific service
+### Restart everything
 ```bash
-docker-compose restart backend
-```
-
-### Rebuild without cache
-```bash
-docker-compose build --no-cache
+docker-compose down
 docker-compose up -d
 ```
 
-### Check database connection
+### Test backend API
 ```bash
-docker exec -it mita-mongodb mongosh
+curl http://localhost:8001/api/health
 ```
 
-## Support
+---
 
-For issues or questions:
-- Email: info@mitaict.com
-- Website: https://mitaict.com/contact
+## Admin Access
+
+- **URL**: https://mitaict.com/admin
+- **Email**: vladanmitic@gmail.com
+- **Password**: Admin123!
+
+---
+
+## File Structure
+
+```
+MITA-ICT/
+├── deploy.sh              # Easy deployment script
+├── docker-compose.yml     # Docker configuration
+├── .env.example           # Environment template
+├── .env                   # Your secrets (not in git)
+├── backend/
+│   ├── Dockerfile
+│   ├── server.py
+│   └── routes/
+└── frontend/
+    ├── Dockerfile
+    ├── nginx-ssl.conf
+    └── src/
+```
