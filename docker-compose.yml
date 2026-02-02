@@ -1,20 +1,12 @@
-# MITA ICT Website - Docker Compose Configuration
-# For Hetzner VPS Deployment
-
 version: '3.8'
 
 services:
-  # MongoDB Database
   mongodb:
     image: mongo:6.0
     container_name: mita-mongodb
     restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-changeme}
     volumes:
       - mongodb_data:/data/db
-      - mongodb_config:/data/configdb
     networks:
       - mita-network
     healthcheck:
@@ -23,25 +15,17 @@ services:
       timeout: 10s
       retries: 3
 
-  # Backend API (FastAPI)
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: mita-backend
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      - MONGO_URL=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-changeme}@mongodb:27017
+      - MONGO_URL=mongodb://mongodb:27017
       - DB_NAME=mita_ict
-      - SECRET_KEY=${SECRET_KEY}
-      - EMERGENT_LLM_KEY=${EMERGENT_LLM_KEY}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USERNAME=${SMTP_USERNAME}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL}
-      - SMTP_TO_EMAIL=${SMTP_TO_EMAIL}
-      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
     depends_on:
       mongodb:
         condition: service_healthy
@@ -53,46 +37,25 @@ services:
       timeout: 10s
       retries: 3
 
-  # Frontend (React - served by Nginx)
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL:-https://api.mitaict.com}
+        - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL:-https://mitaict.com}
         - REACT_APP_RECAPTCHA_SITE_KEY=${REACT_APP_RECAPTCHA_SITE_KEY}
     container_name: mita-frontend
-    restart: unless-stopped
-    networks:
-      - mita-network
-
-  # Nginx Reverse Proxy
-  nginx:
-    image: nginx:alpine
-    container_name: mita-nginx
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
+      - /root/ssl:/etc/letsencrypt:ro
+      - ./frontend/nginx-ssl.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - backend
-      - frontend
     networks:
       - mita-network
-
-  # Certbot for SSL certificates
-  certbot:
-    image: certbot/certbot
-    container_name: mita-certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 networks:
   mita-network:
@@ -100,4 +63,3 @@ networks:
 
 volumes:
   mongodb_data:
-  mongodb_config:

@@ -6,8 +6,8 @@ WORKDIR /app
 # Copy package files
 COPY package.json ./
 
-# Install dependencies with legacy peer deps to avoid ERESOLVE issues
-RUN npm install --legacy-peer-deps
+# Install dependencies with legacy peer deps and add ajv explicitly
+RUN npm install --legacy-peer-deps && npm install ajv@8 --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -29,11 +29,11 @@ FROM nginx:alpine
 # Copy built files
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Copy nginx configuration
+# Copy nginx configuration (will be overridden by volume mount in production)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port
-EXPOSE 80
+# Expose ports
+EXPOSE 80 443
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
