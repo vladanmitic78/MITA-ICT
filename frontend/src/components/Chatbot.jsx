@@ -275,6 +275,8 @@ const Chatbot = () => {
               placeholder="Type your message..."
               disabled={isLoading}
               rows={1}
+              autoComplete="off"
+              autoCorrect="on"
               style={{
                 flex: 1,
                 padding: '12px 16px',
@@ -282,16 +284,22 @@ const Chatbot = () => {
                 border: '1px solid var(--border-color)',
                 background: 'var(--bg-primary)',
                 color: 'var(--text-primary)',
-                fontSize: '14px',
+                fontSize: '16px',
                 resize: 'none',
                 outline: 'none',
                 maxHeight: '100px',
-                minHeight: '44px'
+                minHeight: '44px',
+                WebkitAppearance: 'none'
               }}
             />
             <button
               data-testid="chatbot-send-btn"
-              onClick={handleSendMessage}
+              onClick={(e) => {
+                e.preventDefault();
+                handleSendMessage();
+                // Re-focus input after clicking send button
+                setTimeout(() => inputRef.current?.focus(), 100);
+              }}
               disabled={isLoading || !inputValue.trim()}
               style={{
                 width: '44px',
