@@ -64,6 +64,8 @@ const Chatbot = () => {
       }]);
     } finally {
       setIsLoading(false);
+      // Keep focus on input field so user can continue typing
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
   };
 
