@@ -78,3 +78,7 @@ deployment_package/
 package-lock.json
 yarn.lock
 frontend/yarn.lock
+-e 
+# Environment files
+*.env
+*.env.*
