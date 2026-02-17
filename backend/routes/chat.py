@@ -26,18 +26,70 @@ def get_db():
     return db
 
 
-# System prompt for the chatbot
-CHATBOT_SYSTEM_PROMPT = """You are a friendly and professional sales assistant for MITA ICT, a consulting company with 20+ years of experience in IT and telecommunications. Your goal is to help visitors understand our services and guide them toward scheduling a meeting.
-
-Our Services:
+async def get_dynamic_system_prompt(db) -> str:
+    """
+    Build system prompt dynamically from database content.
+    This ensures the chatbot always has the latest information.
+    """
+    
+    # Fetch services from database
+    services_list = await db.services.find().to_list(100)
+    services_text = ""
+    if services_list:
+        services_text = "Our Services:\n"
+        for i, service in enumerate(services_list, 1):
+            title = service.get('title', 'Service')
+            description = service.get('description', '')
+            services_text += f"{i}. {title} - {description}\n"
+    else:
+        services_text = """Our Services:
 1. IT and Telecommunication Consulting - Infrastructure, network optimization, and advanced solutions.
 2. Company Registration in Sweden - Complete support for business setup in Sweden.
 3. Leading Teams - Expert leadership consulting for sales and engineering teams.
+"""
 
-Our SaaS Products:
+    # Fetch SaaS products from database
+    products_list = await db.saas_products.find().to_list(100)
+    products_text = ""
+    if products_list:
+        products_text = "Our SaaS Products:\n"
+        for i, product in enumerate(products_list, 1):
+            name = product.get('name', 'Product')
+            description = product.get('description', '')
+            price = product.get('price', '')
+            products_text += f"{i}. {name} - {description}"
+            if price:
+                products_text += f" (Starting at {price})"
+            products_text += "\n"
+    else:
+        products_text = """Our SaaS Products:
 1. MITACRM - CRM solution for modern businesses
 2. Routing System - Advanced routing for telecommunications
 3. White Label Software - Customizable solutions
+"""
+
+    # Fetch about content from database
+    about_content = await db.about_content.find_one()
+    about_text = ""
+    if about_content:
+        company_name = about_content.get('company_name', 'MITA ICT')
+        company_description = about_content.get('description', '')
+        years_experience = about_content.get('years_experience', '20+')
+        about_text = f"""About Us:
+- Company: {company_name}
+- Experience: {years_experience} years in IT and telecommunications
+- {company_description}
+"""
+    else:
+        about_text = "About Us: MITA ICT is a consulting company with 20+ years of experience in IT and telecommunications."
+
+    # Build the complete system prompt
+    system_prompt = f"""You are a friendly and professional sales assistant for MITA ICT. Your goal is to help visitors understand our services and guide them toward scheduling a meeting.
+
+{about_text}
+
+{services_text}
+{products_text}
 
 MEETING SCHEDULING - IMPORTANT:
 When a user wants to schedule a meeting or consultation:
@@ -54,11 +106,12 @@ Then immediately follow with a friendly confirmation like:
 
 Guidelines:
 - Be warm, helpful, and conversational
-- Answer questions about services briefly (2-3 sentences)
+- Answer questions about services and products based on the information above
 - After 2-3 exchanges, suggest scheduling a free consultation call
 - If they share contact info, acknowledge warmly
 - Keep responses concise unless they ask for details
-- For pricing questions, suggest a call to discuss their specific needs
+- For pricing questions, mention the prices above if available, or suggest a call to discuss their specific needs
+- If asked about something not listed above, say you'd be happy to connect them with the team for more details
 
 Example meeting scheduling flow:
 User: "I'd like to schedule a meeting"
@@ -69,6 +122,8 @@ User: "How about Thursday at 2pm?"
 You: "MEETING_REQUEST: John Smith | john@example.com | Thursday at 2pm | General consultation"
 "Great choice! I've submitted your meeting request for Thursday at 2pm. Our team will confirm this time slot with you via email shortly. Is there anything specific you'd like to discuss in the meeting?"
 """
+    
+    return system_prompt
 
 
 @router.post("/chat/message", response_model=ChatResponse)
@@ -96,11 +151,14 @@ async def chat_message(request: ChatRequest):
             session = ChatSession()
             session_id = session.id
         
+        # Get dynamic system prompt with latest content from database
+        system_prompt = await get_dynamic_system_prompt(db)
+        
         # Create chat instance with Claude model
         chat = LlmChat(
             api_key=emergent_key,
             session_id=session_id,
-            system_message=CHATBOT_SYSTEM_PROMPT
+            system_message=system_prompt
         ).with_model("anthropic", "claude-sonnet-4-20250514")
         
         # Add previous messages to conversation for context
