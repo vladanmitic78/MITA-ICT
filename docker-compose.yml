@@ -6,7 +6,7 @@ services:
     container_name: mita-mongodb
     restart: unless-stopped
     volumes:
-      - mongodb_data:/data/db
+      - deployment_package_mongodb_data:/data/db
     networks:
       - mita-network
     healthcheck:
