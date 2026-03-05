@@ -89,13 +89,13 @@ async def create_saas_product(product: SaasProductCreate, current_user: dict = D
     """Create a new SaaS product (admin only)"""
     db = get_db()
     product_data = SaasProduct(
-        name=product.name,
+        title=product.title,
         description=product.description,
-        url=product.url,
+        link=product.link,
         features=product.features
     )
     await db.saas_products.insert_one(product_data.dict())
-    logger.info(f"✅ SaaS product created: {product.name}")
+    logger.info(f"✅ SaaS product created: {product.title}")
     return product_data
 
 
