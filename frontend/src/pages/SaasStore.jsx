@@ -1,6 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { ExternalLink, CheckCircle2 } from 'lucide-react';
+import { ExternalLink, CheckCircle2, ChevronRight } from 'lucide-react';
 import { publicAPI } from '../api';
+
+// Helper function to render description as bullet points
+const renderDescriptionAsBullets = (description) => {
+  if (!description) return null;
+  
+  // Split by period followed by space, or newlines
+  const sentences = description
+    .split(/(?<=[.!?])\s+|\n/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+  
+  if (sentences.length <= 1) {
+    // If only one sentence or no clear splits, return as single bullet
+    return (
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        <li style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+          <ChevronRight size={18} color="var(--brand-primary)" style={{ flexShrink: 0, marginTop: '3px' }} />
+          <span className="body-medium">{description}</span>
+        </li>
+      </ul>
+    );
+  }
+  
+  return (
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+      {sentences.map((sentence, index) => (
+        <li key={index} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+          <ChevronRight size={18} color="var(--brand-primary)" style={{ flexShrink: 0, marginTop: '3px' }} />
+          <span className="body-medium">{sentence}</span>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 const SaasStore = () => {
   const [products, setProducts] = useState([]);
@@ -71,9 +105,9 @@ const SaasStore = () => {
                   }}
                 >
                   <h3 className="heading-1" style={{ marginBottom: '16px' }}>{product.title}</h3>
-                  <p className="body-medium" style={{ marginBottom: '24px', flex: 1 }}>
-                    {product.description}
-                  </p>
+                  <div style={{ marginBottom: '24px', flex: 1 }}>
+                    {renderDescriptionAsBullets(product.description)}
+                  </div>
                   
                   {/* Features List */}
                   <div style={{ marginBottom: '32px' }}>

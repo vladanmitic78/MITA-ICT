@@ -1,5 +1,13 @@
 # MITA ICT - Product Requirements Document
 
+## Latest Updates (December 2025)
+
+### Completed - Dec 5, 2025
+- **Bullet Point Descriptions**: Service and product descriptions now render as bullet points instead of paragraph text
+  - Home page services: auto-split by sentences with chevron bullets
+  - SaaS Store products: same treatment for product descriptions
+  - Files: `Home.jsx`, `SaasStore.jsx`
+
 ## Project Overview
 Full-stack consulting website for MITA ICT with AI chatbot, admin panel, and SEO optimization.
 
